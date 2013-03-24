@@ -39,4 +39,37 @@ public class Board {
 		return ships.length;
 	}
 
+	public boolean areAllShipsDestroyed() {
+		for (Ship ship : ships) {
+			if(!ship.isDestroyed()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	
+	
+	
+	protected void onTileHit(Tile tile) {
+		if(tile.hasShip()) {
+			Ship ship = tile.getShip();
+			if(ship.isDestroyed()) {
+				onShipDestoyed(ship);
+			}
+		}
+		// TODO notify observers?
+	}
+
+	protected void onShipDestoyed(Ship ship) {
+		if(areAllShipsDestroyed()) {
+			onAllShipsDestroyed();
+		}
+		// TODO notify observers?
+	}
+	
+	protected void onAllShipsDestroyed() {
+		
+		// TODO notify observers?
+	}
 }
