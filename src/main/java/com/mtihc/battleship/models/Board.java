@@ -1,9 +1,26 @@
 package com.mtihc.battleship.models;
 
+import java.util.LinkedHashSet;
+
 public class Board {
 
+	public interface Observer {
+		void onMiss(Tile tile);
+
+		void onHit(Tile tile);
+
+		void onShipDestoyed(Ship ship);
+		
+		void onAllShipsDestroyed(Board board);
+
+		void onShipPlace(Ship ship);
+
+		void onShipRemove(Ship ship);
+	}
+	
 	private Tile[][] board;
 	private Ship[] ships;
+	private LinkedHashSet<Observer> observers = new LinkedHashSet<Observer>();
 
 	public Board(int width, int height, Ship[] ships) {
 		
@@ -51,9 +68,19 @@ public class Board {
 	
 	
 
+	public boolean addObserver(Observer observer) {
+		return observers.add(observer);
+	}
+	
+	public boolean removeObserver(Observer observer) {
+		return observers.remove(observer);
+	}
+	
 	protected void onMiss(Tile tile) {
-		// TODO Auto-generated method stub
-		
+		// notify observers
+		for (Observer observer : observers) {
+			observer.onMiss(tile);
+		}
 	}
 
 	protected void onHit(Tile tile) {
@@ -61,28 +88,42 @@ public class Board {
 		if(ship.isDestroyed()) {
 			onShipDestoyed(ship);
 		}
-		// TODO notify observers?
+		// notify observers
+		for (Observer observer : observers) {
+			observer.onHit(tile);
+		}
 	}
 
 	protected void onShipDestoyed(Ship ship) {
 		if(areAllShipsDestroyed()) {
 			onAllShipsDestroyed();
 		}
-		// TODO notify observers?
+		// notify observers
+		for (Observer observer : observers) {
+			observer.onShipDestoyed(ship);
+		}
 	}
 	
 	protected void onAllShipsDestroyed() {
 		
-		// TODO notify observers?
+		// notify observers
+		for (Observer observer : observers) {
+			observer.onAllShipsDestroyed(this);
+		}
 	}
 
 	protected void onShipPlace(Ship ship) {
-		// TODO Auto-generated method stub
+		// notify observers
+		for (Observer observer : observers) {
+			observer.onShipPlace(ship);
+		}
 		
 	}
 
 	protected void onShipRemove(Ship ship) {
-		// TODO Auto-generated method stub
-		
+		// notify observers
+		for (Observer observer : observers) {
+			observer.onShipRemove(ship);
+		}
 	}
 }
