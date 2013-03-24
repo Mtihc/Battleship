@@ -3,8 +3,9 @@ package com.mtihc.battleship.models;
 public class Board {
 
 	private Tile[][] board;
+	private Ship[] ships;
 
-	public Board(int width, int height) {
+	public Board(int width, int height, Ship[] ships) {
 		
 		// create tiles
 		this.board = new Tile[width][height];
@@ -14,7 +15,8 @@ public class Board {
 			}
 		}
 		
-		
+		// clone ships array
+		this.ships = ships.clone();
 	}
 	
 	public int getWidth() {
@@ -27,6 +29,14 @@ public class Board {
 	
 	public Tile getTile(int x, int y) {
 		return board[x][y];
+	}
+
+	public Ship[] getShips() {
+		return ships;
+	}
+	
+	public int getShipCount() {
+		return ships.length;
 	}
 
 }
