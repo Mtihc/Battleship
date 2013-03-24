@@ -75,4 +75,14 @@ public class Board {
 		
 		// TODO notify observers?
 	}
+
+	protected void onShipPlace(Ship ship) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void onShipRemove(Ship ship) {
+		// TODO Auto-generated method stub
+		
+	}
 }
