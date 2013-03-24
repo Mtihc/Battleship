@@ -28,5 +28,28 @@ public class Ship {
 		}
 		return true;
 	}
+	
+	public void place(Tile ...args) throws Exception {
+		if(args.length < tiles.length || args.length > tiles.length) {
+			throw new Exception("Incorrect number of tiles. Expected " + tiles.length + ", got " + args.length + ".");
+		}
+		
+		for (int i = 0; i < args.length; i++) {
+			Tile tile = args[i];
+			
+			tiles[i] = tile;
+			tile.setShip(this);
+		}
+	}
+	
+	public void remove() {
+		
+		for (int i = 0; i < tiles.length; i++) {
+			Tile tile = tiles[i];
+
+			tiles[i] = null;
+			tile.setShip(null);
+		}
+	}
 
 }

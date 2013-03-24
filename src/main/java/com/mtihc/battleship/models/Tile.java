@@ -5,6 +5,7 @@ public class Tile {
 	private Board board;
 	private int x;
 	private int y;
+	private Ship ship;
 
 	Tile(Board board, int x, int y) {
 		this.board = board;
@@ -23,5 +24,16 @@ public class Tile {
 	public int getY() {
 		return y;
 	}
+	
+	public boolean hasShip() {
+		return ship != null;
+	}
 
+	public Ship getShip() {
+		return ship;
+	}
+	
+	void setShip(Ship ship) {
+		this.ship = ship;
+	}
 }
