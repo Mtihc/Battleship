@@ -1,0 +1,17 @@
+name: Battleship
+version: 0.1
+description: Play the board game Battleships, in minecraft.
+author: Mtihc
+website: http://dev.bukkit.org/server-mods/Battleship/
+
+main: com.mtihc.battleship.plugin.BattleshipPlugin
+database: false
+depend: []
+startup: postworld
+
+commands:
+  battleship:
+    description: This is the main command. It shows command help.
+    aliases: [bs]
+    permission: battleship.help
+    usage: Execute /battleship, to get command info
