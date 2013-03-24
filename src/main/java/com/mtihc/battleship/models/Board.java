@@ -50,13 +50,16 @@ public class Board {
 	
 	
 	
-	
-	protected void onTileHit(Tile tile) {
-		if(tile.hasShip()) {
-			Ship ship = tile.getShip();
-			if(ship.isDestroyed()) {
-				onShipDestoyed(ship);
-			}
+
+	protected void onMiss(Tile tile) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void onHit(Tile tile) {
+		Ship ship = tile.getShip();
+		if(ship.isDestroyed()) {
+			onShipDestoyed(ship);
 		}
 		// TODO notify observers?
 	}

@@ -48,8 +48,14 @@ public class Tile {
 		}
 		else {
 			hit = true;
-			board.onTileHit(this);
-			return hasShip();
+			if(hasShip()) {
+				board.onHit(this);
+				return true;
+			}
+			else {
+				board.onMiss(this);
+				return false;
+			}
 		}
 	}
 }
