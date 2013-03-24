@@ -29,6 +29,15 @@ public class Ship {
 		return true;
 	}
 	
+	public boolean isDestroyed() {
+		for (int i = 0; i < tiles.length; i++) {
+			if(!tiles[i].isHit()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public void place(Tile ...args) throws Exception {
 		if(args.length < tiles.length || args.length > tiles.length) {
 			throw new Exception("Incorrect number of tiles. Expected " + tiles.length + ", got " + args.length + ".");

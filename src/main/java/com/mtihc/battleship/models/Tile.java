@@ -6,6 +6,7 @@ public class Tile {
 	private int x;
 	private int y;
 	private Ship ship;
+	private boolean hit;
 
 	Tile(Board board, int x, int y) {
 		this.board = board;
@@ -35,5 +36,19 @@ public class Tile {
 	
 	void setShip(Ship ship) {
 		this.ship = ship;
+	}
+	
+	public boolean isHit() {
+		return hit;
+	}
+	
+	public boolean hit() throws Exception {
+		if(isHit()) {
+			throw new Exception("The tile is already hit.");
+		}
+		else {
+			hit = true;
+			return hasShip();
+		}
 	}
 }
