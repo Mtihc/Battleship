@@ -8,8 +8,8 @@ public class Board {
 		
 		// create tiles
 		this.board = new Tile[width][height];
-		for (int x = 0; x < board.length; x++) {
-			for (int y = 0; y < board.length; y++) {
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
 				board[x][y] = new Tile(this, x, y);
 			}
 		}
