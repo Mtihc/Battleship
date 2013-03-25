@@ -1,5 +1,8 @@
 package com.mtihc.battleship.models;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Location;
@@ -24,13 +27,35 @@ public class Game implements ConfigurationSerializable {
 	 * @param values the loaded values
 	 */
 	public Game(Map<String, Object> values) {
-		// TODO Auto-generated constructor stub
+		this.width = (Integer) values.get("width");
+		this.height = (Integer) values.get("height");
+		this.origin = (Location) values.get("origin");
+		
+		List<?> shipTypeList = (List<?>) values.get("ship-types");
+		this.shipTypes = new ShipType[shipTypeList.size()];
+		int i = 0;
+		for (Object object : shipTypeList) {
+			ShipType shipType = ShipType.valueOf(object.toString());
+			this.shipTypes[i] = shipType;
+			i++;
+		}
 	}
 
 	@Override
 	public Map<String, Object> serialize() {
-		// TODO Auto-generated method stub
-		return null;
+		LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("width", width);
+		values.put("height", height);
+		values.put("origin", origin);
+
+		ArrayList<String> shipTypeList = new ArrayList<String>();
+		for (ShipType shipType : shipTypes) {
+			shipTypeList.add(shipType.name());
+		}
+		
+		values.put("ship-types", shipTypeList);
+		
+		return values;
 	}
 
 	public int getWidth() {
