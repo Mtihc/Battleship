@@ -35,6 +35,34 @@ public class BoardView implements Board.Observer {
 	public Board getBoard() {
 		return board;
 	}
+	
+	public void setBoard(Board board) {
+		if(this.board != board) {
+			if(this.board != null) {
+				this.board.removeObserver(this);
+			}
+			if(board != null) {
+				board.addObserver(this);
+			}
+			this.board = board;
+		}
+	}
+	
+	public void switchViews(BoardView otherView) {
+		// switch draw strategy
+		BoardDrawStrategy s = this.drawStrategy;
+		setDrawStrategy(otherView.getDrawStrategy());
+		otherView.setDrawStrategy(s);
+		
+		// switch boards
+		Board b = this.board;
+		setBoard(otherView.getBoard());
+		otherView.setBoard(b);
+		
+		// redraw
+		draw();
+		otherView.draw();
+	}
 
 	public Location getOrigin() {
 		return origin;
@@ -60,6 +88,14 @@ public class BoardView implements Board.Observer {
 		this.locationStrategy = locationStrategy;
 	}
 
+	public void draw() {
+		drawStrategy.draw(this);
+	}
+
+	public void draw(int x, int y) {
+		drawStrategy.draw(this, x, y);
+	}
+	
 	@Override
 	public void onMiss(Tile tile) {
 		draw(tile.getX(), tile.getY());
@@ -80,14 +116,6 @@ public class BoardView implements Board.Observer {
 	public void onAllShipsDestroyed(Board board) {
 		// TODO Auto-generated method stub
 
-	}
-
-	public void draw() {
-		drawStrategy.draw(this);
-	}
-
-	public void draw(int x, int y) {
-		drawStrategy.draw(this, x, y);
 	}
 
 	@Override
