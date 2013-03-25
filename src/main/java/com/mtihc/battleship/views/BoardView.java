@@ -17,21 +17,11 @@ public class BoardView implements Board.Observer {
 	private Location origin;
 	private BlockFace facing;
 	
-	public BoardView(Board board, Location origin) throws Exception {
+	public BoardView(Board board, Location origin) {
 		this.board = board;
 		this.board.addObserver(this);
 		this.origin = origin;
 		this.facing = yawToFace(origin.getYaw());
-		
-		switch(facing) {
-		case EAST:
-		case NORTH:
-		case SOUTH:
-		case WEST:
-			break;
-		default:
-			throw new Exception("Parameter facing must be either EAST, NORTH, SOUTH or WEST.");
-		}
 	}
 	
 	public static BlockFace yawToFace(float yaw) {

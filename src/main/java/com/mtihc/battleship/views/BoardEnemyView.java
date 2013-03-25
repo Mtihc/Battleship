@@ -8,7 +8,7 @@ import com.mtihc.battleship.models.Tile;
 
 public class BoardEnemyView extends BoardView {
 
-	public BoardEnemyView(Board board, Location origin) throws Exception {
+	public BoardEnemyView(Board board, Location origin) {
 		super(board, origin);
 	}
 
