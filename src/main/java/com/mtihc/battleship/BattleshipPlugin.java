@@ -1,4 +1,4 @@
-package com.mtihc.battleship.plugin;
+package com.mtihc.battleship;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
