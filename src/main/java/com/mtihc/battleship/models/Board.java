@@ -22,7 +22,7 @@ public class Board {
 	private Ship[] ships;
 	private LinkedHashSet<Observer> observers = new LinkedHashSet<Observer>();
 
-	public Board(int width, int height, Ship[] ships) {
+	public Board(int width, int height, ShipType[] shipTypes) {
 		
 		// create tiles
 		this.board = new Tile[width][height];
@@ -32,8 +32,11 @@ public class Board {
 			}
 		}
 		
-		// clone ships array
-		this.ships = ships.clone();
+		// create ships array
+		this.ships = new Ship[shipTypes.length];
+		for (int i = 0; i < shipTypes.length; i++) {
+			this.ships[i] = new Ship(this, shipTypes[i]);
+		}
 	}
 	
 	public int getWidth() {

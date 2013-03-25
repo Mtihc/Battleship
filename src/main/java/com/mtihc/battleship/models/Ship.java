@@ -3,14 +3,21 @@ package com.mtihc.battleship.models;
 public class Ship {
 
 	private Board board;
+	private ShipType shipType;
 	private Tile[] tiles;
 	
-	public Ship(int size) {
-		tiles = new Tile[size];
+	public Ship(Board board, ShipType shipType) {
+		this.board = board;
+		this.shipType = shipType;
+		this.tiles = new Tile[shipType.getShipSize()];
 	}
 	
 	public Board getBoard() {
 		return board;
+	}
+	
+	public ShipType getType() {
+		return shipType;
 	}
 	
 	public int getSize() {

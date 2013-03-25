@@ -5,7 +5,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.mtihc.battleship.controllers.GameController;
+import com.mtihc.battleship.models.Game;
+import com.mtihc.battleship.models.ShipType;
+import com.mtihc.battleship.views.GameView;
 
 public class BattleshipPlugin extends JavaPlugin {
 
@@ -30,7 +32,22 @@ public class BattleshipPlugin extends JavaPlugin {
 				
 				if(subcommand.equalsIgnoreCase("start")) {
 					// TODO add commands
-					new GameController(10, 10, ((Player) sender).getLocation()).initialize();
+					ShipType[] shipTypes = new ShipType[] {
+							ShipType.PATROL_BOAT,
+							ShipType.PATROL_BOAT,
+							ShipType.PATROL_BOAT,
+							ShipType.PATROL_BOAT,
+							ShipType.DESTROYER,
+							ShipType.DESTROYER,
+							ShipType.DESTROYER,
+							ShipType.SUBMARINE,
+							ShipType.SUBMARINE,
+							ShipType.SUBMARINE,
+							ShipType.BATTLESHIP,
+							ShipType.AIRCRAFT_CARRIER,
+					};
+					Game game = new Game(10, 10, ((Player) sender).getLocation(), shipTypes);
+					new GameView(game).initialize();
 				}
 				else {
 					sender.sendMessage("Unknown command: /battleship " + subcommand);
