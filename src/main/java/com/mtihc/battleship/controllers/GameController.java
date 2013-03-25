@@ -1,13 +1,12 @@
 package com.mtihc.battleship.controllers;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 
 import com.mtihc.battleship.models.Board;
 import com.mtihc.battleship.models.Ship;
-import com.mtihc.battleship.views.BoardEnemyView;
+import com.mtihc.battleship.views.BoardDrawStrategy;
 import com.mtihc.battleship.views.BoardView;
 
 public class GameController {
@@ -21,8 +20,8 @@ public class GameController {
 	private BoardView leftBoardView;
 	private BoardView rightBoardView;
 	
-	private BoardEnemyView leftEnemyView;
-	private BoardEnemyView rightEnemyView;
+	private BoardView leftEnemyView;
+	private BoardView rightEnemyView;
 
 	public GameController(int width, int height, Location origin) {
 		leftBoard = new Board(width, height, createShips());
@@ -43,8 +42,10 @@ public class GameController {
 		leftBoardView = new BoardView(leftBoard, leftOrigin, facingRight);
 		rightBoardView = new BoardView(rightBoard, rightOrigin, facingLeft);
 		
-		leftEnemyView = new BoardEnemyView(rightBoard, leftOrigin, facingRight);
-		rightEnemyView = new BoardEnemyView(leftBoard, rightOrigin, facingLeft);
+		leftEnemyView = new BoardView(rightBoard, leftOrigin, facingRight);
+		rightEnemyView = new BoardView(leftBoard, rightOrigin, facingLeft);
+		leftEnemyView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
+		rightEnemyView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
 	}
 
 	private Ship[] createShips() {

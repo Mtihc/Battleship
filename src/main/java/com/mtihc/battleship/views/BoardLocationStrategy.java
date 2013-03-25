@@ -4,9 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 
-public abstract class TileLocationStrategy {
+public abstract class BoardLocationStrategy {
 
-	public static final TileLocationStrategy VERTICAL = new TileLocationStrategy() {
+	public static final BoardLocationStrategy VERTICAL = new BoardLocationStrategy() {
 		
 		@Override
 		public Location getTileLocation(BoardView board, int x, int y) {
@@ -29,7 +29,7 @@ public abstract class TileLocationStrategy {
 		}
 	};
 	
-	public static final TileLocationStrategy HORIZONTAL = new TileLocationStrategy() {
+	public static final BoardLocationStrategy HORIZONTAL = new BoardLocationStrategy() {
 		
 		@Override
 		public Location getTileLocation(BoardView board, int x, int y) {
@@ -51,7 +51,7 @@ public abstract class TileLocationStrategy {
 		}
 	};
 	
-	protected TileLocationStrategy() {
+	protected BoardLocationStrategy() {
 		
 	}
 	
