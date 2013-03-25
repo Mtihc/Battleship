@@ -33,13 +33,13 @@ public class BoardView implements Board.Observer {
 
 		switch (facing) {
 		case NORTH:
-			return new Location(world, origin.getBlockX() + x, origin.getBlockZ(), origin.getBlockZ() + y);
+			return new Location(world, origin.getBlockX() + x, origin.getBlockY(), origin.getBlockZ() + y);
 		case SOUTH:
-			return new Location(world, origin.getBlockX() - x, origin.getBlockZ(), origin.getBlockZ() - y);
+			return new Location(world, origin.getBlockX() - x, origin.getBlockY(), origin.getBlockZ() - y);
 		case EAST:
-			return new Location(world, origin.getBlockX() + y, origin.getBlockZ(), origin.getBlockZ() + x);
+			return new Location(world, origin.getBlockX() + y, origin.getBlockY(), origin.getBlockZ() + x);
 		case WEST:
-			return new Location(world, origin.getBlockX() - y, origin.getBlockZ(), origin.getBlockZ() - x);
+			return new Location(world, origin.getBlockX() - y, origin.getBlockY(), origin.getBlockZ() - x);
 		default:
 			return null;
 		}
