@@ -10,6 +10,7 @@ public class BoardEnemyView extends BoardView {
 
 	public BoardEnemyView(Board board, Location origin) {
 		super(board, origin);
+		setTileLocationStrategy(TileLocationStrategy.VERTICAL);
 	}
 
 	@Override

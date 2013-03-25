@@ -1,7 +1,6 @@
 package com.mtihc.battleship.views;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -16,33 +15,39 @@ public class BoardView implements Board.Observer {
 	private Board board;
 	private Location origin;
 	private BlockFace facing;
+
+	private TileLocationStrategy tileLocationStrategy;
 	
 	public BoardView(Board board, Location origin) {
 		this.board = board;
 		this.board.addObserver(this);
 		this.origin = origin;
 		this.facing = yawToFace(origin.getYaw());
+		this.tileLocationStrategy = TileLocationStrategy.HORIZONTAL;
 	}
 	
 	public static BlockFace yawToFace(float yaw) {
 		return axis[Math.round(yaw / 90f) & 0x3];
     }
 	
-	public Location getTileLocation(int x, int y) {
-		World world = origin.getWorld();
+	public Board getBoard() {
+		return board;
+	}
+	
+	public Location getOrigin() {
+		return origin;
+	}
+	
+	public BlockFace getFacingDirection() {
+		return facing;
+	}
 
-		switch (facing) {
-		case NORTH:
-			return new Location(world, origin.getBlockX() + x, origin.getBlockY(), origin.getBlockZ() + y);
-		case SOUTH:
-			return new Location(world, origin.getBlockX() - x, origin.getBlockY(), origin.getBlockZ() - y);
-		case EAST:
-			return new Location(world, origin.getBlockX() + y, origin.getBlockY(), origin.getBlockZ() + x);
-		case WEST:
-			return new Location(world, origin.getBlockX() - y, origin.getBlockY(), origin.getBlockZ() - x);
-		default:
-			return null;
-		}
+	public TileLocationStrategy getTileLocationStrategy() {
+		return tileLocationStrategy;
+	}
+
+	public void setTileLocationStrategy(TileLocationStrategy tileLocationStrategy) {
+		this.tileLocationStrategy = tileLocationStrategy;
 	}
 	
 	public void draw() {
@@ -54,7 +59,7 @@ public class BoardView implements Board.Observer {
 	}
 	
 	public void draw(int x, int y) {
-		Block block = getTileLocation(x, y).getBlock();
+		Block block = tileLocationStrategy.getTileLocation(this, x, y).getBlock();
 		Tile tile = board.getTile(x, y);
 		
 		if(tile.isHit()) {
