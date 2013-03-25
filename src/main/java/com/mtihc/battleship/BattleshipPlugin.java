@@ -29,9 +29,9 @@ public class BattleshipPlugin extends JavaPlugin {
 			String subcommand;
 			if(args.length > 0) {
 				subcommand = args[0];
-				
+				// TODO add commands
 				if(subcommand.equalsIgnoreCase("start")) {
-					// TODO add commands
+					Player player = (Player) sender;
 					ShipType[] shipTypes = new ShipType[] {
 							ShipType.PATROL_BOAT,
 							ShipType.PATROL_BOAT,
@@ -46,8 +46,9 @@ public class BattleshipPlugin extends JavaPlugin {
 							ShipType.BATTLESHIP,
 							ShipType.AIRCRAFT_CARRIER,
 					};
-					Game game = new Game(10, 10, ((Player) sender).getLocation(), shipTypes);
-					new GameView(game).initialize();
+					Game game = new Game(10, 10, player.getLocation(), shipTypes);
+					// TODO invite/challenge system
+					new GameView(game, player, player).initialize();
 				}
 				else {
 					sender.sendMessage("Unknown command: /battleship " + subcommand);
