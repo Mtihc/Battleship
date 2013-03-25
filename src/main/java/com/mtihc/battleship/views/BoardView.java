@@ -69,21 +69,41 @@ public class BoardView implements Board.Observer {
 		
 		if(tile.isHit()) {
 			if(tile.hasShip()) {
-				// TODO draw, broken ship
+				// draw, broken ship
+				drawDamagedShip(tile, block);
 			}
 			else {
-				// TODO draw, enemy missed
+				// draw, enemy missed
+				drawMiss(tile, block);
 			}
 		}
 		else {
 			if(tile.hasShip()) {
-				// TODO draw, ship
+				// draw, ship
+				drawShip(tile, block);
 			}
 			else {
-				// TODO draw, board
+				// draw, board
+				drawBoard(tile, block);
 			}
 		}
 		
+	}
+
+	protected void drawBoard(Tile tile, Block block) {
+		block.setTypeIdAndData(90, (byte)0, false);// bricks
+	}
+
+	protected void drawShip(Tile tile, Block block) {
+		block.setTypeIdAndData(5, (byte) 0, false);// plank
+	}
+
+	protected void drawMiss(Tile tile, Block block) {
+		block.setTypeIdAndData(98, (byte) 2, false);// cracked bricks
+	}
+
+	protected void drawDamagedShip(Tile tile, Block block) {
+		block.setTypeIdAndData(5, (byte) 1, false);// dark planks
 	}
 
 	@Override
