@@ -10,7 +10,7 @@ import com.mtihc.battleship.models.Tile;
 
 public class BoardView implements Board.Observer {
 	
-	public static final BlockFace[] axis = { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST };
+	public static final BlockFace[] axis = { BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST };
 	
 	private Board board;
 	private Location origin;
@@ -18,11 +18,11 @@ public class BoardView implements Board.Observer {
 
 	private TileLocationStrategy tileLocationStrategy;
 	
-	public BoardView(Board board, Location origin) {
+	public BoardView(Board board, Location origin, BlockFace facing) {
 		this.board = board;
 		this.board.addObserver(this);
 		this.origin = origin;
-		this.facing = yawToFace(origin.getYaw());
+		this.facing = facing;
 		this.tileLocationStrategy = TileLocationStrategy.HORIZONTAL;
 	}
 	
@@ -86,7 +86,7 @@ public class BoardView implements Board.Observer {
 	}
 
 	protected void drawBoard(Tile tile, Block block) {
-		block.setTypeIdAndData(90, (byte)0, false);// bricks
+		block.setTypeIdAndData(98, (byte)0, false);// bricks
 	}
 
 	protected void drawShip(Tile tile, Block block) {

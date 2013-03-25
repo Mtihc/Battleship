@@ -1,6 +1,8 @@
 package com.mtihc.battleship.controllers;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 
 import com.mtihc.battleship.models.Board;
@@ -30,23 +32,41 @@ public class GameController {
 		BlockFace facingLeft = BoardView.yawToFace(origin.getYaw() - 90);
 		BlockFace facingRight = BoardView.yawToFace(origin.getYaw() + 90);
 		
-		leftOrigin = origin.getBlock().getRelative(facingLeft, 2).getRelative(facing, width).getLocation();
-		rightOrigin = origin.getBlock().getRelative(facingRight, 2).getRelative(facing, 1).getLocation();
+		leftOrigin = origin.getBlock().getRelative(facingLeft, 3).getRelative(facing, width).getLocation();
+		rightOrigin = origin.getBlock().getRelative(facingRight, 3).getRelative(facing, 1).getLocation();
+		
 
 		// TODO see if boards line up
-		//leftOrigin.getBlock().setType(Material.DIAMOND_BLOCK);
-		//rightOrigin.getBlock().setType(Material.IRON_BLOCK);
+		rightOrigin.getBlock().setType(Material.IRON_BLOCK);
+		leftOrigin.getBlock().setType(Material.DIAMOND_BLOCK);
 		
-		leftBoardView = new BoardView(leftBoard, leftOrigin);
-		rightBoardView = new BoardView(rightBoard, rightOrigin);
+		leftBoardView = new BoardView(leftBoard, leftOrigin, facingRight);
+		rightBoardView = new BoardView(rightBoard, rightOrigin, facingLeft);
 		
-		leftEnemyView = new BoardEnemyView(rightBoard, leftOrigin);
-		rightEnemyView = new BoardEnemyView(leftBoard, rightOrigin);
+		leftEnemyView = new BoardEnemyView(rightBoard, leftOrigin, facingRight);
+		rightEnemyView = new BoardEnemyView(leftBoard, rightOrigin, facingLeft);
 	}
 
 	private Ship[] createShips() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Ship[] {
+				new Ship(2),
+				new Ship(2),
+				new Ship(2),
+				new Ship(2),
+				new Ship(3),
+				new Ship(3),
+				new Ship(3),
+				new Ship(4),
+				new Ship(4),
+				new Ship(5)
+		};
 	}
 
+	public void initialize() {
+		leftBoardView.draw();
+		leftEnemyView.draw();
+		
+		rightBoardView.draw();
+		rightEnemyView.draw();
+	}
 }

@@ -2,7 +2,10 @@ package com.mtihc.battleship.plugin;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.mtihc.battleship.controllers.GameController;
 
 public class BattleshipPlugin extends JavaPlugin {
 
@@ -27,6 +30,7 @@ public class BattleshipPlugin extends JavaPlugin {
 				
 				if(subcommand.equalsIgnoreCase("start")) {
 					// TODO add commands
+					new GameController(10, 10, ((Player) sender).getLocation()).initialize();
 				}
 				else {
 					sender.sendMessage("Unknown command: /battleship " + subcommand);
