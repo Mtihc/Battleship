@@ -5,6 +5,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.mtihc.battleship.controllers.GameManager;
+import com.mtihc.battleship.controllers.InvitationManager;
 import com.mtihc.battleship.models.Game;
 import com.mtihc.battleship.models.GameRepository;
 import com.mtihc.battleship.models.GameYamlRepository;

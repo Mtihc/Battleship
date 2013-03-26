@@ -1,4 +1,4 @@
-package com.mtihc.battleship;
+package com.mtihc.battleship.controllers;
 
 import java.io.IOException;
 import java.util.logging.Level;

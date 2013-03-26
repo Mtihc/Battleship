@@ -1,11 +1,10 @@
-package com.mtihc.battleship;
+package com.mtihc.battleship.controllers;
 
 import java.util.HashMap;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.mtihc.battleship.controllers.GameController;
 import com.mtihc.battleship.models.Game;
 import com.mtihc.battleship.models.GameRepository;
 

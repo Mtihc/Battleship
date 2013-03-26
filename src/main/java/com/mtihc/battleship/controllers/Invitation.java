@@ -1,4 +1,4 @@
-package com.mtihc.battleship;
+package com.mtihc.battleship.controllers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

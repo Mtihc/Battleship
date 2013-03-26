@@ -1,4 +1,4 @@
-package com.mtihc.battleship;
+package com.mtihc.battleship.controllers;
 
 import java.util.HashMap;
 
@@ -33,7 +33,7 @@ public class InvitationManager {
 	 * @throws Exception
 	 *             when the InvitationManager is already created.
 	 */
-	protected InvitationManager(JavaPlugin plugin) throws Exception {
+	public InvitationManager(JavaPlugin plugin) throws Exception {
 		if (instance != null) {
 			throw new Exception(
 					"InvitationManager is already created. Use static method getInstance() instead.");

@@ -1,4 +1,4 @@
-package com.mtihc.battleship;
+package com.mtihc.battleship.controllers;
 
 public class InvitationException extends Exception {
 	
