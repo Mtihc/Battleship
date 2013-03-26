@@ -114,6 +114,8 @@ public class GameManager {
 		
 		left.controller = controller;
 		right.controller = controller;
+		left.view = controller.getView().getLeftSide();
+		right.view = controller.getView().getRightSide();
 		
 		players.put(left.getName(), left);
 		players.put(right.getName(), right);
