@@ -6,7 +6,7 @@ public class Ship {
 	private ShipType shipType;
 	private Tile[] tiles;
 	
-	public Ship(Board board, ShipType shipType) {
+	Ship(Board board, ShipType shipType) {
 		this.board = board;
 		this.shipType = shipType;
 		this.tiles = new Tile[shipType.getShipSize()];
