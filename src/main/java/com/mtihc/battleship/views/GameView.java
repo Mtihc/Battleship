@@ -42,6 +42,8 @@ public class GameView {
 		// the enemy ships should be hidden
 		leftEnemyView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
 		rightEnemyView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
+		leftEnemyView.setLocationStrategy(BoardLocationStrategy.VERTICAL);
+		rightEnemyView.setLocationStrategy(BoardLocationStrategy.VERTICAL);
 		
 		leftSide = new GameViewSide(leftPlayer, leftBoard, leftBoardView, leftEnemyView);
 		rightSide = new GameViewSide(rightPlayer, rightBoard, rightBoardView, rightEnemyView);
