@@ -135,12 +135,6 @@ public class BoardView implements Board.Observer {
 	}
 
 	@Override
-	public void onAllShipsDestroyed(Board board) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void onShipPlace(Ship ship) {
 		Tile[] tiles = ship.getTiles();
 		for (Tile tile : tiles) {

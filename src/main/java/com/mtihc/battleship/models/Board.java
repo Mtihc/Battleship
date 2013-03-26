@@ -10,8 +10,6 @@ public class Board {
 		void onHit(Tile tile);
 
 		void onShipDestoyed(Ship ship);
-		
-		void onAllShipsDestroyed(Board board);
 
 		void onShipPlace(Ship ship);
 
@@ -58,15 +56,6 @@ public class Board {
 	public int getShipCount() {
 		return ships.length;
 	}
-
-	public boolean areAllShipsDestroyed() {
-		for (Ship ship : ships) {
-			if(!ship.isDestroyed()) {
-				return false;
-			}
-		}
-		return true;
-	}
 	
 	
 	
@@ -98,20 +87,9 @@ public class Board {
 	}
 
 	protected void onShipDestoyed(Ship ship) {
-		if(areAllShipsDestroyed()) {
-			onAllShipsDestroyed();
-		}
 		// notify observers
 		for (Observer observer : observers) {
 			observer.onShipDestoyed(ship);
-		}
-	}
-	
-	protected void onAllShipsDestroyed() {
-		
-		// notify observers
-		for (Observer observer : observers) {
-			observer.onAllShipsDestroyed(this);
 		}
 	}
 
