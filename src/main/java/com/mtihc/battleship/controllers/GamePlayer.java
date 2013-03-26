@@ -1,6 +1,7 @@
 package com.mtihc.battleship.controllers;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.mtihc.battleship.views.GameView;
 import com.mtihc.battleship.views.GameView.GameViewSide;
@@ -29,6 +30,11 @@ public class GamePlayer {
 	
 	public GameView.GameViewSide getView() {
 		return view;
+	}
+
+	protected void onPlayerInteract(PlayerInteractEvent event) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

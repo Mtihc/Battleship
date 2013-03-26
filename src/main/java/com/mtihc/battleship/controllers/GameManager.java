@@ -2,6 +2,7 @@ package com.mtihc.battleship.controllers;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -56,6 +57,9 @@ public class GameManager {
 		
 		this.plugin = plugin;
 		this.repo = repository;
+		
+		GameEventHandler listener = new GameEventHandler(this);
+		Bukkit.getPluginManager().registerEvents(listener, plugin);
 	}
 	
 	/**
@@ -83,8 +87,12 @@ public class GameManager {
 		return games.containsKey(gameId);
 	}
 
-	private boolean hasPlayer(String name) {
+	public boolean hasPlayer(String name) {
 		return players.containsKey(name);
+	}
+	
+	public GamePlayer getPlayer(String name) {
+		return players.get(name);
 	}
 
 	/**
@@ -110,6 +118,7 @@ public class GameManager {
 		GamePlayer right = new GamePlayer(rightPlayer);
 		
 		GameController controller = new GameController(plugin, left, right, game);
+		// TODO remove from the map. at some point
 		games.put(controller.getId(), controller);
 		
 		left.controller = controller;
@@ -117,6 +126,7 @@ public class GameManager {
 		left.view = controller.getView().getLeftSide();
 		right.view = controller.getView().getRightSide();
 		
+		// TODO remove both from the map, at some point
 		players.put(left.getName(), left);
 		players.put(right.getName(), right);
 		
