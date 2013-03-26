@@ -1,11 +1,9 @@
 package com.mtihc.battleship.controllers;
 
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.Event.Result;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -41,24 +39,19 @@ public class GamePlayer {
 	public GameView.GameViewSide getView() {
 		return view;
 	}
-
+	
 	protected void onPlayerInteract(PlayerInteractEvent event) {
-		if(!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			return;
-		}
-		
+		event.setUseInteractedBlock(Result.DENY);
 		event.setUseItemInHand(Result.DENY);
 		event.setCancelled(true);
 		
 		if(!controller.areAllShipsPlaced(view.getBoard())) {
-			// still in setup mode, TODO use GameState instead?
+			// still in setup mode, because not all ships are placed
 			
-			Block block = event.getClickedBlock();
 			BlockFace facing = BoardView.yawToFace(event.getPlayer().getLocation().getYaw());
-			ItemStack item = event.getItem();
 			Board board = view.getBoard();
 			BoardView boardView = view.getInteractiveView();
-			Tile tile = boardView.getLocationStrategy().locationToTile(boardView, block.getLocation());
+			Tile tile = boardView.getLocationStrategy().locationToTile(boardView, event.getClickedBlock().getLocation());
 			if(tile == null) {
 				// clicked outside of the board
 				return;
@@ -72,45 +65,71 @@ public class GamePlayer {
 			for (int i = 0; i < ships.length; i++) {
 				Ship ship = ships[i];
 				
-				if(ship.getType().isSimilar(item) && !ship.isPlaced()) {
+				if(ship.getType().isSimilar(event.getItem()) && !ship.isPlaced()) {
 					// placing a ship
 					
-					Bukkit.getLogger().info("clicked tile x:" + tile.getX() + ", y:" + tile.getY());
+					if(!placeShip(ship, tile, event.getClickedBlock(), facing)) {
+						// couldn't place this ship
+						// continue to try the next ship
+						continue;
+					}
 					
-					int n = ship.getSize();
-					Tile[] tiles = new Tile[n];
-					tiles[0] = tile;
-					Block tileBlock = block;
-					Tile next;
-					for (int j = 1; j < n; j++) {
-						tileBlock = tileBlock.getRelative(facing);
-						next = boardView.getLocationStrategy().locationToTile(boardView, tileBlock.getLocation());
-						if(next == null) {
-							// ship does not fit on the board
-							return;
+					
+					// remove ship items from player's inventory
+					int amountToRemove = ship.getSize();
+					ItemStack itemToRemove = ship.getType().getNormal().toItemStack();
+					for (ItemStack item : event.getPlayer().getInventory()) {
+						if(itemToRemove.isSimilar(item)) {
+							if (item.getAmount() > amountToRemove){
+								item.setAmount(item.getAmount() - amountToRemove);
+			                    amountToRemove = 0;
+			                }else{
+			                    amountToRemove -= item.getAmount();
+			                    event.getPlayer().getInventory().remove(item);
+			                }
 						}
-						tiles[j] = next;
 					}
-					try {
-						ship.place(tiles);
-					} catch (Exception e) {
-						// failed to place ship
-						return;
-					}
-					// TODO remove ship items from player's inventory
-					//event.getPlayer().getInventory().remove(new ItemStack(item.getTypeId(), n, item.getData().getData()));
+					// TODO event.getPlayer().updateInventory();
 					
-					// break the loop, since we found a ship that matches the item in your hand
+					// break the loop, since we placed a ship
 					break;
 				}
 			}
-			
-			// TODO place part of the ship (or entire ship using facing direction of player?)
 		}
 		else {
 			// not in setup mode, must be battling
 			
 			// TODO place TNT
+		}
+	}
+	
+	private boolean placeShip(Ship ship, Tile clickedTile, Block clickedBlock, BlockFace facing) {
+		BoardView boardView = view.getInteractiveView();
+		Tile[] shipTiles = new Tile[ship.getSize()];
+		shipTiles[0] = clickedTile;
+		Block tileBlock = clickedBlock;
+		Tile next;
+		
+		// find the other Tiles for the Ship
+		for (int j = 1; j < ship.getSize(); j++) {
+			tileBlock = tileBlock.getRelative(facing);
+			next = boardView.getLocationStrategy().locationToTile(boardView, tileBlock.getLocation());
+			if(next == null) {
+				// ship does not fit on the board
+				return false;
+			}
+			else if(next.hasShip()) {
+				// this tile already occupied by a ship
+				return false;
+			}
+			shipTiles[j] = next;
+		}
+		try {
+			ship.place(shipTiles);
+			return true;
+		} catch (Exception e) {
+			// failed to place ship
+			return false;
 		}
 	}
 
