@@ -6,14 +6,30 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mtihc.battleship.models.Game;
+import com.mtihc.battleship.models.GameRepository;
+import com.mtihc.battleship.models.GameYamlRepository;
 import com.mtihc.battleship.models.ShipType;
-import com.mtihc.battleship.views.GameView;
 
 public class BattleshipPlugin extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
+		
+		// create game yml repository
+		String directory = getDataFolder() + "/games";
+		GameRepository repository = new GameYamlRepository(directory);
+		
+		// create managers
+		try {
+			new InvitationManager(this);
+			new GameManager(this, repository);
+		}
+		catch(Exception e) {
+			// already exist
+		}
+		
+		
 	}
 
 	@Override
@@ -46,9 +62,9 @@ public class BattleshipPlugin extends JavaPlugin {
 							ShipType.BATTLESHIP,
 							ShipType.AIRCRAFT_CARRIER,
 					};
-					Game game = new Game(10, 10, player.getLocation(), shipTypes);
+					Game game = new Game("test", 10, 10, player.getLocation(), shipTypes);
 					// TODO invite/challenge system
-					new GameView(game, player, player).initialize();
+					GameManager.getInstance().initialize(game, player, player);
 				}
 				else {
 					sender.sendMessage("Unknown command: /battleship " + subcommand);

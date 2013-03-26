@@ -10,12 +10,14 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class Game implements ConfigurationSerializable {
 
+	private String id;
 	private int width;
 	private int height;
 	private Location origin;
 	private ShipType[] shipTypes;
 	
-	public Game(int width, int height, Location origin, ShipType[] shipTypes) {
+	public Game(String id, int width, int height, Location origin, ShipType[] shipTypes) {
+		this.id = id;
 		this.width = width;
 		this.height = height;
 		this.origin = origin;
@@ -27,6 +29,7 @@ public class Game implements ConfigurationSerializable {
 	 * @param values the loaded values
 	 */
 	public Game(Map<String, Object> values) {
+		this.id = (String) values.get("id");
 		this.width = (Integer) values.get("width");
 		this.height = (Integer) values.get("height");
 		this.origin = (Location) values.get("origin");
@@ -44,6 +47,7 @@ public class Game implements ConfigurationSerializable {
 	@Override
 	public Map<String, Object> serialize() {
 		LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("id", id);
 		values.put("width", width);
 		values.put("height", height);
 		values.put("origin", origin);
@@ -56,6 +60,10 @@ public class Game implements ConfigurationSerializable {
 		values.put("ship-types", shipTypeList);
 		
 		return values;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public int getWidth() {

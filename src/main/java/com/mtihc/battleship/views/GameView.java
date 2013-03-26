@@ -84,15 +84,17 @@ public class GameView {
 		public BoardView getProjectorView() {
 			return projectorView;
 		}
+
+		public void draw() {
+			interactiveView.draw();
+			projectorView.draw();
+		}
 		
 		
 	}
-
-	public void initialize() {
-		leftSide.getInteractiveView().draw();
-		leftSide.getProjectorView().draw();
-		
-		rightSide.getInteractiveView().draw();
-		rightSide.getProjectorView().draw();
+	
+	public void draw() {
+		leftSide.draw();
+		rightSide.draw();
 	}
 }

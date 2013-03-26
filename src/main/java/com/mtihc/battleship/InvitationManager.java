@@ -33,7 +33,7 @@ public class InvitationManager {
 	 * @throws Exception
 	 *             when the InvitationManager is already created.
 	 */
-	public InvitationManager(JavaPlugin plugin) throws Exception {
+	protected InvitationManager(JavaPlugin plugin) throws Exception {
 		if (instance != null) {
 			throw new Exception(
 					"InvitationManager is already created. Use static method getInstance() instead.");
@@ -99,10 +99,10 @@ public class InvitationManager {
 			}
 		}
 
-		addInvitation(invitation);
-
-		invitation.scheduleCancel();
 		invitation.onSend();
+		receiver.getPlayer().sendMessage(invitation.getMessages());
+		
+		addInvitation(invitation);
 	}
 
 	/**
@@ -123,9 +123,9 @@ public class InvitationManager {
 					+ " is offline.");
 		}
 
-		removeInvitation(invitation);
-
 		invitation.onAccept();
+		
+		removeInvitation(invitation);
 	}
 
 	/**
@@ -140,9 +140,25 @@ public class InvitationManager {
 			throw new InvitationException("Not invited by anyone. Or invitation expired.");
 		}
 
-		removeInvitation(invitation);
-
 		invitation.onDeny();
+		
+		removeInvitation(invitation);
+	}
+	
+	/**
+	 * Cancel an invitation that was sent.
+	 * @param sender The sender
+	 * @throws InvitationException when there are no invitations sent by the given sender
+	 */
+	public void cancel(Player sender) throws InvitationException {
+		Invitation invitation = invitations.get(sender.getName());
+		if(invitation == null || invitation.getReceiver().getName().equals(sender.getName())) {
+			throw new InvitationException("There are no sent invitations to cancel.");
+		}
+		
+		invitation.onCancel();
+		
+		removeInvitation(invitation);
 	}
 
 	/**
