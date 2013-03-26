@@ -9,7 +9,7 @@ public class Board {
 
 		void onHit(Tile tile);
 
-		void onShipDestoyed(Ship ship);
+		void onShipDestroyed(Ship ship);
 
 		void onShipPlace(Ship ship);
 
@@ -37,37 +37,70 @@ public class Board {
 		}
 	}
 	
+	/**
+	 * The width of the board (columns)
+	 * @return the width of the board
+	 */
 	public int getWidth() {
 		return board.length;
 	}
 	
+	/**
+	 * The height of the board (rows)
+	 * @return the height of the board
+	 */
 	public int getHeight() {
 		return board[0].length;
 	}
 	
-	public Tile getTile(int x, int y) {
+	/**
+	 * Returns the tile at the specified coordinates on the board.
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @return the Tile at the given coordinates on the board
+	 * @throws IndexOutOfBoundsException when the x-coordinate or y-coordate are out of bounds
+	 */
+	public Tile getTile(int x, int y) throws IndexOutOfBoundsException {
 		return board[x][y];
 	}
 
+	/**
+	 * All the ships that belong to this board.
+	 * @return an array of Ship objects
+	 */
 	public Ship[] getShips() {
 		return ships;
 	}
 	
+	/**
+	 * The amount of ships that belong to this board.
+	 * @return the amount of ships
+	 */
 	public int getShipCount() {
 		return ships.length;
 	}
 	
 	
-	
-
-	public boolean addObserver(Observer observer) {
-		return observers.add(observer);
+	/**
+	 * Add an observer to the list.
+	 * @param observer the observer to add
+	 */
+	public void addObserver(Observer observer) {
+		observers.add(observer);
 	}
 	
-	public boolean removeObserver(Observer observer) {
-		return observers.remove(observer);
+	/**
+	 * Remove an observer from the list.
+	 * @param observer the observer to remove
+	 */
+	public void removeObserver(Observer observer) {
+		observers.remove(observer);
 	}
 	
+	/**
+	 * Called when the enemy attacked this board, but didn't hit a ship.
+	 * @param tile the tile that was hit
+	 */
 	protected void onMiss(Tile tile) {
 		// notify observers
 		for (Observer observer : observers) {
@@ -75,6 +108,10 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Called when the enemy attacked and hit a ship!
+	 * @param tile the tile that was hit and contains part of the ship
+	 */
 	protected void onHit(Tile tile) {
 		Ship ship = tile.getShip();
 		if(ship.isDestroyed()) {
@@ -86,13 +123,21 @@ public class Board {
 		}
 	}
 
+	/**
+	 * Called when all all tiles belonging to a ship are hit. 
+	 * @param ship the ship that was destroyed
+	 */
 	protected void onShipDestoyed(Ship ship) {
 		// notify observers
 		for (Observer observer : observers) {
-			observer.onShipDestoyed(ship);
+			observer.onShipDestroyed(ship);
 		}
 	}
 
+	/**
+	 * Called when a ship is placed on the board, during setup.
+	 * @param ship the ship that was placed
+	 */
 	protected void onShipPlace(Ship ship) {
 		// notify observers
 		for (Observer observer : observers) {
@@ -101,6 +146,10 @@ public class Board {
 		
 	}
 
+	/**
+	 * Called when a ship is removed from the board, during setup.
+	 * @param ship
+	 */
 	protected void onShipRemove(Ship ship) {
 		// notify observers
 		for (Observer observer : observers) {

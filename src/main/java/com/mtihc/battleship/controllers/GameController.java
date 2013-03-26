@@ -18,17 +18,114 @@ public class GameController implements Board.Observer {
 	GameController(JavaPlugin plugin, GamePlayer left, GamePlayer right, Game game) {
 		this.plugin = plugin;
 		this.game = game;
+		// relation between GameView and Game model
 		this.view = new GameView(game, left.getPlayer(), right.getPlayer());
 		
+		// relation between GameView and this controller
 		view.getLeftSide().getBoard().addObserver(this);
 		view.getRightSide().getBoard().addObserver(this);
 		
 	}
 	
+	/**
+	 * The id of the game model
+	 * @return id of the game model
+	 */
 	public String getId() {
 		return game.getId();
 	}
+
+	/**
+	 * The plugin
+	 * @return the plugin
+	 */
+	public JavaPlugin getPlugin() {
+		return plugin;
+	}
+
+	/**
+	 * The game model
+	 * @return the game model
+	 */
+	public Game getGame() {
+		return game;
+	}
 	
+	/**
+	 * The game view
+	 * @return the game view
+	 */
+	public GameView getView() {
+		return view;
+	}
+
+	/**
+	 * The left player
+	 * @return the left player
+	 */
+	public OfflinePlayer getLeftPlayer() {
+		return view.getLeftSide().getPlayer();
+	}
+
+	/**
+	 * The right player
+	 * @return the right player
+	 */
+	public OfflinePlayer getRightPlayer() {
+		return view.getRightSide().getPlayer();
+	}
+
+	/**
+	 * Returns the other board
+	 * @param board input board
+	 * @return other board
+	 */
+	public Board getEnemyBoard(Board board) {
+		if(board == view.getLeftSide().getBoard()) {
+			return view.getRightSide().getBoard();
+		}
+		else if(board == view.getRightSide().getBoard()) {
+			return view.getLeftSide().getBoard();
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns whether all ships are placed on a board
+	 * @param board the board
+	 * @return true if all ships are placed, false otherwise
+	 */
+	public boolean areAllShipsPlaced(Board board) {
+		Ship[] ships = board.getShips();
+		for (Ship ship : ships) {
+			if(!ship.isPlaced()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns wether all ships are destroyed on a board
+	 * @param board the board
+	 * @return true if all ships are destroyed, false otherwise
+	 */
+	public boolean areAllShipsDestroyed(Board board) {
+		Ship[] ships = board.getShips();
+		for (Ship ship : ships) {
+			if(!ship.isDestroyed()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * Throws an exception with appropriate text, when any of the players are offline.
+	 * @throws GameException when both players are offline, or either one of them
+	 */
 	public void checkOnline() throws GameException {
 		OfflinePlayer left = getLeftPlayer();
 		OfflinePlayer right = getRightPlayer();
@@ -44,6 +141,14 @@ public class GameController implements Board.Observer {
 		}
 	}
 	
+	/**
+	 * Initialize the game. 
+	 * 
+	 * <p>Draws the board. Teleports players. </p>
+	 * <p>And prepares to start placing ships.</p>
+	 * 
+	 * @throws GameException
+	 */
 	public void initialize() throws GameException {
 		view.draw();
 		
@@ -57,59 +162,6 @@ public class GameController implements Board.Observer {
 		// TODO start placing ships
 	}
 
-	public JavaPlugin getPlugin() {
-		return plugin;
-	}
-
-	public Game getGame() {
-		return game;
-	}
-	
-	public GameView getView() {
-		return view;
-	}
-
-	public OfflinePlayer getLeftPlayer() {
-		return view.getLeftSide().getPlayer();
-	}
-
-	public OfflinePlayer getRightPlayer() {
-		return view.getRightSide().getPlayer();
-	}
-
-	public Board getEnemyBoard(Board board) {
-		if(board == view.getLeftSide().getBoard()) {
-			return view.getRightSide().getBoard();
-		}
-		else if(board == view.getRightSide().getBoard()) {
-			return view.getLeftSide().getBoard();
-		}
-		else {
-			return null;
-		}
-	}
-
-	public boolean areAllShipsPlaced(Board board) {
-		Ship[] ships = board.getShips();
-		for (Ship ship : ships) {
-			if(!ship.isPlaced()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean areAllShipsDestroyed(Board board) {
-		Ship[] ships = board.getShips();
-		for (Ship ship : ships) {
-			if(!ship.isDestroyed()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-
 	@Override
 	public void onMiss(Tile tile) {
 		// TODO player says: Miss!
@@ -121,7 +173,7 @@ public class GameController implements Board.Observer {
 	}
 
 	@Override
-	public void onShipDestoyed(Ship ship) {
+	public void onShipDestroyed(Ship ship) {
 		// TODO player says: You sunk my ship.getName()
 		
 		Board board = ship.getBoard();

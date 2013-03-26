@@ -49,14 +49,28 @@ public class GameView {
 		rightSide = new GameViewSide(rightPlayer, rightBoard, rightBoardView, rightEnemyView);
 	}
 	
+	/**
+	 * The left GameViewSide
+	 * @return left side of the view
+	 */
 	public GameViewSide getLeftSide() {
 		return leftSide;
 	}
 	
+	/**
+	 * The right GameViewSide
+	 * @return right side of the view
+	 */
 	public GameViewSide getRightSide() {
 		return rightSide;
 	}
 	
+	/**
+	 * Inner class of GameView. Represents one side of the view. 
+	 * 
+	 * @author Mitch
+	 *
+	 */
 	public class GameViewSide {
 		
 		private OfflinePlayer player;
@@ -71,22 +85,49 @@ public class GameView {
 			this.projectorView = projectorView;
 		}
 
+		/**
+		 * The player that is playing on this side of the view
+		 * @return the player
+		 */
 		public OfflinePlayer getPlayer() {
 			return player;
 		}
 
+		/**
+		 * The board model, that is being observed and displayed by this view
+		 * @return the board model
+		 */
 		public Board getBoard() {
 			return board;
 		}
 
+		/**
+		 * The interactive board view. 
+		 * 
+		 * <p>This is the board to place your ships on. It will displaying the enemy's board later on, 
+		 * so you can place bombs on it.</p>
+		 * 
+		 * @return the interactive board view.
+		 */
 		public BoardView getInteractiveView() {
 			return interactiveView;
 		}
 
+		/**
+		 * The projector board view.
+		 * 
+		 * <p>This is the board that will be displaying your ships, 
+		 * exactly as you placed them on the interactive board view before. </p>
+		 * 
+		 * @return the projector board view
+		 */
 		public BoardView getProjectorView() {
 			return projectorView;
 		}
 
+		/**
+		 * Draws both board views, on this side of the game view.
+		 */
 		public void draw() {
 			interactiveView.draw();
 			projectorView.draw();
@@ -95,6 +136,9 @@ public class GameView {
 		
 	}
 	
+	/**
+	 * Draws both sides of this game view.
+	 */
 	public void draw() {
 		leftSide.draw();
 		rightSide.draw();
