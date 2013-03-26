@@ -10,7 +10,7 @@ import java.util.Set;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-public class GameYamlRepository<T extends Game> implements GameRepository<T> {
+public class GameYamlRepository implements GameRepository {
 
 	private static final String KEY = "game";
 	
@@ -29,8 +29,7 @@ public class GameYamlRepository<T extends Game> implements GameRepository<T> {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public T getGame(String id) throws IOException, InvalidConfigurationException {
+	public Game getGame(String id) throws IOException, InvalidConfigurationException {
 		File file = new File(directory, id + ".yml");
 		YamlConfiguration config = new YamlConfiguration();
 		try {
@@ -38,11 +37,11 @@ public class GameYamlRepository<T extends Game> implements GameRepository<T> {
 		} catch(FileNotFoundException e) {
 			return null;
 		}
-		return (T) config.get(KEY);
+		return (Game) config.get(KEY);
 	}
 
 	@Override
-	public void setGame(String id, T game) throws IOException {
+	public void setGame(String id, Game game) throws IOException {
 		if(game == null) {
 			deleteGame(id);
 			return;
