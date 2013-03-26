@@ -2,6 +2,7 @@ package com.mtihc.battleship.views;
 
 import org.bukkit.block.Block;
 
+import com.mtihc.battleship.models.Ship;
 import com.mtihc.battleship.models.Tile;
 
 public class BoardDrawStrategy {
@@ -32,7 +33,7 @@ public class BoardDrawStrategy {
 	}
 	
 	public void draw(BoardView view, int x, int y) {
-		Block block = view.getLocationStrategy().getTileLocation(view, x, y).getBlock();
+		Block block = view.getLocationStrategy().tileToLocation(view, x, y).getBlock();
 		Tile tile = view.getBoard().getTile(x, y);
 		
 		if(tile.isHit()) {
@@ -63,7 +64,10 @@ public class BoardDrawStrategy {
 	}
 
 	protected void drawShip(Tile tile, Block block) {
-		block.setTypeIdAndData(5, (byte) 0, false);// plank
+		Ship ship = tile.getShip();
+		int typeId = ship.getType().getNormal().getItemTypeId();
+		byte data = ship.getType().getNormal().getData();
+		block.setTypeIdAndData(typeId, data, false);
 	}
 
 	protected void drawMiss(Tile tile, Block block) {
@@ -71,7 +75,10 @@ public class BoardDrawStrategy {
 	}
 
 	protected void drawDamagedShip(Tile tile, Block block) {
-		block.setTypeIdAndData(5, (byte) 1, false);// dark planks
+		Ship ship = tile.getShip();
+		int typeId = ship.getType().getDamaged().getItemTypeId();
+		byte data = ship.getType().getDamaged().getData();
+		block.setTypeIdAndData(typeId, data, false);
 	}
 
 }

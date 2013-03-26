@@ -116,7 +116,7 @@ public class BoardView implements Board.Observer {
 	 * @return the center location
 	 */
 	public Location getCenterLocation() {
-		Location result = locationStrategy.getTileLocation(this, board.getWidth() / 2, board.getHeight() / 2);
+		Location result = locationStrategy.tileToLocation(this, board.getWidth() / 2, board.getHeight() / 2);
 		result.setYaw(faceToYaw(facing));
 		result.setPitch(0);
 		return result;
