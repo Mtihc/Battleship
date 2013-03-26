@@ -31,6 +31,21 @@ public class BoardView implements Board.Observer {
 	public static BlockFace yawToFace(float yaw) {
 		return axis[Math.round(yaw / 90f) & 0x3];
 	}
+	
+	public static float faceToYaw(BlockFace face) {
+		switch(face) {
+		case EAST:
+			return -90;
+		case NORTH:
+			return 180;
+		case WEST:
+			return 90;
+		case SOUTH:
+			return 0;
+		default:
+			return 0;
+		}
+	}
 
 	public Board getBoard() {
 		return board;
@@ -62,6 +77,13 @@ public class BoardView implements Board.Observer {
 		// redraw
 		draw();
 		otherView.draw();
+	}
+	
+	public Location getCenterLocation() {
+		Location result = locationStrategy.getTileLocation(this, board.getWidth() / 2, board.getHeight() / 2);
+		result.setYaw(faceToYaw(facing));
+		result.setPitch(0);
+		return result;
 	}
 
 	public Location getOrigin() {

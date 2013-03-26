@@ -22,6 +22,8 @@ public class GameController {
 	
 	public void initialize() {
 		view.draw();
+		getLeftPlayer().teleport(view.getLeftSide().getInteractiveView().getCenterLocation());
+		getRightPlayer().teleport(view.getRightSide().getInteractiveView().getCenterLocation());
 		// TODO 
 	}
 
