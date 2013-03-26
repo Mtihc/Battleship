@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.mtihc.battleship.controllers.GameException;
 import com.mtihc.battleship.controllers.GameManager;
 import com.mtihc.battleship.controllers.InvitationManager;
 import com.mtihc.battleship.models.Game;
@@ -66,7 +67,11 @@ public class BattleshipPlugin extends JavaPlugin {
 					};
 					Game game = new Game("test", 10, 10, player.getLocation(), shipTypes);
 					// TODO invite/challenge system
-					GameManager.getInstance().initialize(game, player, player);
+					try {
+						GameManager.getInstance().createController(game, player, player).initialize();
+					} catch (GameException e) {
+						sender.sendMessage(e.getMessage());
+					}
 				}
 				else {
 					sender.sendMessage("Unknown command: /battleship " + subcommand);

@@ -32,7 +32,10 @@ public class GameInvitation extends Invitation {
 
 		GameManager mgr = GameManager.getInstance();
 
-		if (mgr.hasRunningGame(gameId)) {
+		OfflinePlayer sender = getSender();
+		OfflinePlayer receiver = getReceiver();
+		
+		if (mgr.hasGame(gameId)) {
 			throw new InvitationException("Somebody is already playing \"" + gameId + "\".");
 		}
 
@@ -53,9 +56,6 @@ public class GameInvitation extends Invitation {
 			throw new InvitationException("Game \"" + gameId + "\" does not exist.");
 		}
 
-		OfflinePlayer sender = getSender();
-		OfflinePlayer receiver = getReceiver();
-
 		setMessages(new String[] {
 				ChatColor.WHITE + sender.getName() + ChatColor.GOLD + " has invited you to play a game of Battleships at " + ChatColor.WHITE + gameId + ChatColor.GOLD + ".",
 				ChatColor.GOLD + "  To accept the invitation, type " + ChatColor.WHITE + getAcceptCommandUsage(),
@@ -71,14 +71,19 @@ public class GameInvitation extends Invitation {
 	protected void onAccept() throws InvitationException {
 		super.onAccept();
 
+		GameManager mgr = GameManager.getInstance();
 		Player sender = getSender().getPlayer();
 		Player receiver = getReceiver().getPlayer();
-
+		
 		sender.sendMessage(ChatColor.WHITE + receiver.getName() + ChatColor.GOLD + " accepted your request.");
 		receiver.sendMessage(ChatColor.GOLD + "You accepted the request of " + ChatColor.WHITE + sender.getName() + ChatColor.GOLD + ".");
 
 		// TODO initialize game
-		GameManager.getInstance().initialize(game, sender, receiver);
+		try {
+			mgr.createController(game, sender, receiver).initialize();
+		} catch (GameException e) {
+			throw new InvitationException("Game could not be initialized due to a GameException: " + e.getMessage(), e);
+		}
 	}
 
 	@Override

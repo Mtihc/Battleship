@@ -10,6 +10,7 @@ import com.mtihc.battleship.models.GameRepository;
 
 public class GameManager {
 
+	// singleton
 	private static GameManager instance;
 
 	/**
@@ -27,6 +28,7 @@ public class GameManager {
 	private JavaPlugin plugin;
 	private GameRepository repo;
 	private HashMap<String, GameController> games = new HashMap<String, GameController>();
+	private HashMap<String, GamePlayer> players = new HashMap<String, GamePlayer>();
 
 	/**
 	 * Constructor.
@@ -77,8 +79,12 @@ public class GameManager {
 	 * @param gameId the game id
 	 * @return whether the game is running
 	 */
-	public boolean hasRunningGame(String gameId) {
+	public boolean hasGame(String gameId) {
 		return games.containsKey(gameId);
+	}
+
+	private boolean hasPlayer(String name) {
+		return players.containsKey(name);
 	}
 
 	/**
@@ -87,13 +93,32 @@ public class GameManager {
 	 * @param game the game to initialize
 	 * @param leftPlayer the left player
 	 * @param rightPlayer the right player
+	 * @throws GameException when game is already being played
 	 */
-	public void initialize(Game game, Player leftPlayer, Player rightPlayer) {
+	public GameController createController(Game game, Player leftPlayer, Player rightPlayer) throws GameException {
+		if(games.containsKey(game.getId())) {
+			throw new GameException("Somebody is already playing at \"" + game.getId() + "\".");
+		}
+		if(hasPlayer(leftPlayer.getName())) {
+			throw new GameException(leftPlayer.getName() + " is already playing a game.");
+		}
+		if(hasPlayer(rightPlayer.getName())) {
+			throw new GameException(rightPlayer + " is already playing a game.");
+		}
 		
-		GameController controller = new GameController(plugin, leftPlayer, rightPlayer, game);
-		games.put(game.getId(), controller);
+		GamePlayer left = new GamePlayer(leftPlayer);
+		GamePlayer right = new GamePlayer(rightPlayer);
 		
-		controller.initialize();
+		GameController controller = new GameController(plugin, left, right, game);
+		games.put(controller.getId(), controller);
+		
+		left.controller = controller;
+		right.controller = controller;
+		
+		players.put(left.getName(), left);
+		players.put(right.getName(), right);
+		
+		return controller;
 	}
 	
 	

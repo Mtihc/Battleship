@@ -1,8 +1,8 @@
 package com.mtihc.battleship.views;
 
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 
 import com.mtihc.battleship.models.Board;
 import com.mtihc.battleship.models.Game;
@@ -12,7 +12,7 @@ public class GameView {
 	private GameViewSide leftSide;
 	private GameViewSide rightSide;
 
-	public GameView(Game game, Player leftPlayer, Player rightPlayer) {
+	public GameView(Game game, OfflinePlayer leftPlayer, OfflinePlayer rightPlayer) {
 		// create boards (model)
 		Board leftBoard = new Board(game.getWidth(), game.getHeight(), game.getShipTypes());
 		Board rightBoard = new Board(game.getWidth(), game.getHeight(), game.getShipTypes());
@@ -59,19 +59,19 @@ public class GameView {
 	
 	public class GameViewSide {
 		
-		private Player player;
+		private OfflinePlayer player;
 		private Board board;
 		private BoardView interactiveView;
 		private BoardView projectorView;
 
-		public GameViewSide(Player player, Board board, BoardView interactiveView, BoardView projectorView) {
+		public GameViewSide(OfflinePlayer player, Board board, BoardView interactiveView, BoardView projectorView) {
 			this.player = player;
 			this.board = board;
 			this.interactiveView = interactiveView;
 			this.projectorView = projectorView;
 		}
 
-		public Player getPlayer() {
+		public OfflinePlayer getPlayer() {
 			return player;
 		}
 

@@ -1,6 +1,6 @@
 package com.mtihc.battleship.controllers;
 
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mtihc.battleship.models.Board;
@@ -15,21 +15,45 @@ public class GameController implements Board.Observer {
 	private Game game;
 	private GameView view;
 	
-	public GameController(JavaPlugin plugin, Player leftPlayer, Player rightPlayer, Game game) {
+	GameController(JavaPlugin plugin, GamePlayer left, GamePlayer right, Game game) {
 		this.plugin = plugin;
 		this.game = game;
-		this.view = new GameView(game, leftPlayer, rightPlayer);
+		this.view = new GameView(game, left.getPlayer(), right.getPlayer());
 		
 		view.getLeftSide().getBoard().addObserver(this);
 		view.getRightSide().getBoard().addObserver(this);
+		
 	}
 	
+	public String getId() {
+		return game.getId();
+	}
 	
+	public void checkOnline() throws GameException {
+		OfflinePlayer left = getLeftPlayer();
+		OfflinePlayer right = getRightPlayer();
+		
+		if(!left.isOnline() && !right.isOnline()) {
+			throw new GameException(left.getName() + " and " + right.getName() + " are both offline.");
+		}
+		else if(!left.isOnline()) {
+			throw new GameException(left.getName() + " is offline.");
+		}
+		else if(!right.isOnline()) {
+			throw new GameException(right.getName() + " is offline.");
+		}
+	}
 	
-	public void initialize() {
+	public void initialize() throws GameException {
 		view.draw();
-		getLeftPlayer().teleport(view.getLeftSide().getInteractiveView().getCenterLocation());
-		getRightPlayer().teleport(view.getRightSide().getInteractiveView().getCenterLocation());
+		
+		checkOnline();
+		
+		getLeftPlayer().getPlayer().teleport(
+				view.getLeftSide().getInteractiveView().getCenterLocation());
+		getRightPlayer().getPlayer().teleport(
+				view.getRightSide().getInteractiveView().getCenterLocation());
+		
 		// TODO start placing ships
 	}
 
@@ -45,11 +69,11 @@ public class GameController implements Board.Observer {
 		return view;
 	}
 
-	public Player getLeftPlayer() {
+	public OfflinePlayer getLeftPlayer() {
 		return view.getLeftSide().getPlayer();
 	}
 
-	public Player getRightPlayer() {
+	public OfflinePlayer getRightPlayer() {
 		return view.getRightSide().getPlayer();
 	}
 
