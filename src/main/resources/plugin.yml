@@ -4,7 +4,7 @@ description: Play the board game Battleships, in minecraft.
 author: Mtihc
 website: http://dev.bukkit.org/server-mods/Battleship/
 
-main: com.mtihc.battleship.plugin.BattleshipPlugin
+main: com.mtihc.battleship.BattleshipPlugin
 database: false
 depend: []
 startup: postworld
