@@ -1,5 +1,6 @@
 package com.mtihc.battleship.controllers;
 
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -107,10 +108,13 @@ public class GameController implements Board.Observer {
 		
 		checkOnline();
 		
-		getLeftPlayer().getPlayer().teleport(
-				view.getLeftSide().getInteractiveView().getCenterLocation());
-		getRightPlayer().getPlayer().teleport(
-				view.getRightSide().getInteractiveView().getCenterLocation());
+		Location loc = view.getLeftSide().getInteractiveView().getCenterLocation();
+		loc.setY(loc.getY() - 1);
+		getLeftPlayer().getPlayer().teleport(loc);
+		
+		loc = view.getRightSide().getInteractiveView().getCenterLocation();
+		loc.setY(loc.getY() - 1);
+		getRightPlayer().getPlayer().teleport(loc);
 		
 		// TODO start placing ships
 	}
