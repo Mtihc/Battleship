@@ -74,36 +74,6 @@ public class GameController implements Board.Observer {
 	public OfflinePlayer getRightPlayer() {
 		return view.getRightSide().getPlayer();
 	}
-
-	/**
-	 * Returns whether all ships are placed on a board
-	 * @param board the board
-	 * @return true if all ships are placed, false otherwise
-	 */
-	public boolean areAllShipsPlaced(Board board) {
-		Ship[] ships = board.getShips();
-		for (Ship ship : ships) {
-			if(!ship.isPlaced()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Returns wether all ships are destroyed on a board
-	 * @param board the board
-	 * @return true if all ships are destroyed, false otherwise
-	 */
-	public boolean areAllShipsDestroyed(Board board) {
-		Ship[] ships = board.getShips();
-		for (Ship ship : ships) {
-			if(!ship.isDestroyed()) {
-				return false;
-			}
-		}
-		return true;
-	}
 	
 	/**
 	 * Throws an exception with appropriate text, when any of the players are offline.
@@ -159,24 +129,19 @@ public class GameController implements Board.Observer {
 	public void onShipDestroyed(Ship ship) {
 		// TODO player says: You sunk my ship.getName()
 		
-		Board board = ship.getBoard();
-		if(!areAllShipsDestroyed(board)) {
+		if(!game.areAllShipsDestroyed()) {
 			return;
 		}
-		if(!areAllShipsDestroyed(board.getEnemy())) {
-			return;
-		}
-		
 		// TODO game end
 	}
 
 	@Override
 	public void onShipPlace(Ship ship) {
 		Board board = ship.getBoard();
-		if(!areAllShipsPlaced(board)) {
+		if(!board.areAllShipsPlaced()) {
 			return;
 		}
-		if(!areAllShipsPlaced(board.getEnemy())) {
+		if(!board.areAllShipsPlaced()) {
 			return;
 		}
 		// all ships are placed on both sides

@@ -44,7 +44,8 @@ public class GamePlayer {
 	protected void onPlayerInteract(PlayerInteractEvent event) {
 
 		if(event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			if(controller.areAllShipsPlaced(view.getBoard())) {
+			// TODO use game state
+			if(!controller.getGame().areAllShipsPlaced()) {
 				placeShip(event);
 			}
 		}

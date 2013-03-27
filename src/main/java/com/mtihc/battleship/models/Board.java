@@ -2,6 +2,7 @@ package com.mtihc.battleship.models;
 
 import java.util.LinkedHashSet;
 
+
 public class Board {
 
 	public interface Observer {
@@ -15,13 +16,20 @@ public class Board {
 
 		void onShipRemove(Ship ship);
 	}
-	
+
+	private LinkedHashSet<Observer> observers = new LinkedHashSet<Observer>();
+
+	private Game game;
 	private Tile[][] board;
 	private Ship[] ships;
-	private LinkedHashSet<Observer> observers = new LinkedHashSet<Observer>();
 	Board enemy;
 
-	public Board(int width, int height, ShipType[] shipTypes) {
+	public Board(Game game) {
+		
+		this.game = game;
+		int width = game.getWidth();
+		int height = game.getHeight();
+		ShipType[] shipTypes = game.getShipTypes();
 		
 		// create tiles
 		this.board = new Tile[width][height];
@@ -36,6 +44,10 @@ public class Board {
 		for (int i = 0; i < shipTypes.length; i++) {
 			this.ships[i] = new Ship(this, shipTypes[i]);
 		}
+	}
+	
+	public Game getGame() {
+		return game;
 	}
 	
 	public Board getEnemy() {
@@ -85,7 +97,27 @@ public class Board {
 		return ships.length;
 	}
 	
+	public boolean areAllShipsDestroyed() {
+		for (int i = 0; i < ships.length; i++) {
+			if(!ships[i].isDestroyed()) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
+	public boolean areAllShipsPlaced() {
+		for (int i = 0; i < ships.length; i++) {
+			if(!ships[i].isPlaced()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+
+	
+
 	/**
 	 * Add an observer to the list.
 	 * @param observer the observer to add

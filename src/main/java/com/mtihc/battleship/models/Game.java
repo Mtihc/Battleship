@@ -9,7 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class Game implements ConfigurationSerializable {
-
+	
 	private String id;
 	private int width;
 	private int height;
@@ -25,10 +25,7 @@ public class Game implements ConfigurationSerializable {
 		this.origin = origin;
 		this.shipTypes = shipTypes;
 		
-		this.leftBoard = new Board(width, height, shipTypes);
-		this.rightBoard = new Board(width, height, shipTypes);
-		leftBoard.enemy = rightBoard;
-		rightBoard.enemy = leftBoard;
+		init();
 	}
 	
 	/**
@@ -49,6 +46,8 @@ public class Game implements ConfigurationSerializable {
 			this.shipTypes[i] = shipType;
 			i++;
 		}
+		
+		init();
 	}
 
 	@Override
@@ -69,6 +68,13 @@ public class Game implements ConfigurationSerializable {
 		return values;
 	}
 
+	private void init() {
+		this.leftBoard = new Board(this);
+		this.rightBoard = new Board(this);
+		leftBoard.enemy = rightBoard;
+		rightBoard.enemy = leftBoard;
+	}
+	
 	public String getId() {
 		return id;
 	}
@@ -111,6 +117,14 @@ public class Game implements ConfigurationSerializable {
 	
 	public Board getRightBoard() {
 		return rightBoard;
+	}
+	
+	public boolean areAllShipsPlaced() {
+		return leftBoard.areAllShipsPlaced() && rightBoard.areAllShipsPlaced();
+	}
+	
+	public boolean areAllShipsDestroyed() {
+		return leftBoard.areAllShipsDestroyed() && rightBoard.areAllShipsDestroyed();
 	}
 
 }
