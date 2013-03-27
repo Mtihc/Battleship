@@ -11,42 +11,33 @@ public class GameView {
 
 	private GameViewSide leftSide;
 	private GameViewSide rightSide;
+	
+	private BlockFace forward;
+	private BlockFace left;
+	private BlockFace right;
 
 	public GameView(Game game, OfflinePlayer leftPlayer, OfflinePlayer rightPlayer) {
 		// create boards (model)
-		Board leftBoard = new Board(game.getWidth(), game.getHeight(), game.getShipTypes());
-		Board rightBoard = new Board(game.getWidth(), game.getHeight(), game.getShipTypes());
+		Board leftBoard = game.getLeftBoard();
+		Board rightBoard = game.getRightBoard();
 		
 		Location origin = game.getOrigin();
 		
 		// set facing directions
-		BlockFace facing = BoardView.yawToFace(origin.getYaw());
-		BlockFace facingLeft = BoardView.yawToFace(origin.getYaw() - 90);
-		BlockFace facingRight = BoardView.yawToFace(origin.getYaw() + 90);
+		forward = BoardView.yawToFace(origin.getYaw());
+		left = BoardView.yawToFace(origin.getYaw() - 90);
+		right = BoardView.yawToFace(origin.getYaw() + 90);
 		
 		//
 		// set origin locations for the views
 		// 
 		// left side's origin is a little to the left and all the way forward
-		Location leftOrigin = origin.getBlock().getRelative(facingLeft, 3).getRelative(facing, game.getWidth()).getLocation();
+		Location leftOrigin = origin.getBlock().getRelative(left, 3).getRelative(forward, game.getWidth()).getLocation();
 		// right side's origin is a little to the right and that's about it. 
-		Location rightOrigin = origin.getBlock().getRelative(facingRight, 3).getRelative(facing, 1).getLocation();
+		Location rightOrigin = origin.getBlock().getRelative(right, 3).getRelative(forward, 1).getLocation();
 		
-		// create normal views that show your own board
-		BoardView leftBoardView = new BoardView(leftBoard, leftOrigin, facingRight);
-		BoardView rightBoardView = new BoardView(rightBoard, rightOrigin, facingLeft);
-		
-		// create views that show your enemy's board
-		BoardView leftEnemyView = new BoardView(rightBoard, leftOrigin, facingRight);
-		BoardView rightEnemyView = new BoardView(leftBoard, rightOrigin, facingLeft);
-		// the enemy ships should be hidden
-		leftEnemyView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
-		rightEnemyView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
-		leftEnemyView.setLocationStrategy(BoardLocationStrategy.VERTICAL);
-		rightEnemyView.setLocationStrategy(BoardLocationStrategy.VERTICAL);
-		
-		leftSide = new GameViewSide(leftPlayer, leftBoard, leftBoardView, leftEnemyView);
-		rightSide = new GameViewSide(rightPlayer, rightBoard, rightBoardView, rightEnemyView);
+		leftSide = new GameViewSide(leftPlayer, leftBoard, rightBoard, leftOrigin, left);
+		rightSide = new GameViewSide(rightPlayer, rightBoard, rightBoard, rightOrigin, right);
 	}
 	
 	/**
@@ -78,11 +69,13 @@ public class GameView {
 		private BoardView interactiveView;
 		private BoardView projectorView;
 
-		public GameViewSide(OfflinePlayer player, Board board, BoardView interactiveView, BoardView projectorView) {
+		public GameViewSide(OfflinePlayer player, Board board, Board enemy, Location origin, BlockFace facing) {
 			this.player = player;
 			this.board = board;
-			this.interactiveView = interactiveView;
-			this.projectorView = projectorView;
+			this.interactiveView = new BoardView(board, origin, facing);
+			this.projectorView = new BoardView(enemy, origin, facing);
+			this.projectorView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
+			this.projectorView.setLocationStrategy(BoardLocationStrategy.VERTICAL);
 		}
 
 		/**

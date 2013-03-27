@@ -55,8 +55,7 @@ public class BoardView implements Board.Observer {
 	private BoardDrawStrategy drawStrategy;
 
 	public BoardView(Board board, Location origin, BlockFace facing) {
-		this.board = board;
-		this.board.addObserver(this);
+		setBoard(board);
 		this.origin = origin;
 		this.facing = facing;
 		this.locationStrategy = BoardLocationStrategy.HORIZONTAL;

@@ -15,6 +15,8 @@ public class Game implements ConfigurationSerializable {
 	private int height;
 	private Location origin;
 	private ShipType[] shipTypes;
+	private Board leftBoard;
+	private Board rightBoard;
 	
 	public Game(String id, int width, int height, Location origin, ShipType[] shipTypes) {
 		this.id = id;
@@ -22,6 +24,9 @@ public class Game implements ConfigurationSerializable {
 		this.height = height;
 		this.origin = origin;
 		this.shipTypes = shipTypes;
+		
+		this.leftBoard = new Board(width, height, shipTypes);
+		this.rightBoard = new Board(width, height, shipTypes);
 	}
 	
 	/**
@@ -96,6 +101,14 @@ public class Game implements ConfigurationSerializable {
 
 	public void setShipTypes(ShipType[] shipTypes) {
 		this.shipTypes = shipTypes;
+	}
+	
+	public Board getLeftBoard() {
+		return leftBoard;
+	}
+	
+	public Board getRightBoard() {
+		return rightBoard;
 	}
 
 }
