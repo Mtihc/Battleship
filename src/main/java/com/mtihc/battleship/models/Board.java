@@ -19,6 +19,7 @@ public class Board {
 	private Tile[][] board;
 	private Ship[] ships;
 	private LinkedHashSet<Observer> observers = new LinkedHashSet<Observer>();
+	Board enemy;
 
 	public Board(int width, int height, ShipType[] shipTypes) {
 		
@@ -35,6 +36,10 @@ public class Board {
 		for (int i = 0; i < shipTypes.length; i++) {
 			this.ships[i] = new Ship(this, shipTypes[i]);
 		}
+	}
+	
+	public Board getEnemy() {
+		return enemy;
 	}
 	
 	/**

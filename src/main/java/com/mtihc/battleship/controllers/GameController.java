@@ -76,23 +76,6 @@ public class GameController implements Board.Observer {
 	}
 
 	/**
-	 * Returns the other board
-	 * @param board input board
-	 * @return other board
-	 */
-	public Board getEnemyBoard(Board board) {
-		if(board == view.getLeftSide().getBoard()) {
-			return view.getRightSide().getBoard();
-		}
-		else if(board == view.getRightSide().getBoard()) {
-			return view.getLeftSide().getBoard();
-		}
-		else {
-			return null;
-		}
-	}
-
-	/**
 	 * Returns whether all ships are placed on a board
 	 * @param board the board
 	 * @return true if all ships are placed, false otherwise
@@ -180,8 +163,7 @@ public class GameController implements Board.Observer {
 		if(!areAllShipsDestroyed(board)) {
 			return;
 		}
-		board = getEnemyBoard(board);
-		if(!areAllShipsDestroyed(board)) {
+		if(!areAllShipsDestroyed(board.getEnemy())) {
 			return;
 		}
 		
@@ -194,8 +176,7 @@ public class GameController implements Board.Observer {
 		if(!areAllShipsPlaced(board)) {
 			return;
 		}
-		board = getEnemyBoard(board);
-		if(!areAllShipsPlaced(board)) {
+		if(!areAllShipsPlaced(board.getEnemy())) {
 			return;
 		}
 		// all ships are placed on both sides

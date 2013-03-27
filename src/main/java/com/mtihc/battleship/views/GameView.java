@@ -29,7 +29,7 @@ public class GameView {
 		right = BoardView.yawToFace(origin.getYaw() + 90);
 		
 		//
-		// set origin locations for the views
+		// set origin locations for the views at the top-left (relative to their facing direction)
 		// 
 		// left side's origin is a little to the left and all the way forward
 		Location leftOrigin = origin.getBlock().getRelative(left, 3).getRelative(forward, game.getWidth()).getLocation();
@@ -38,6 +38,8 @@ public class GameView {
 		
 		leftSide = new GameViewSide(leftPlayer, leftBoard, rightBoard, leftOrigin, left);
 		rightSide = new GameViewSide(rightPlayer, rightBoard, rightBoard, rightOrigin, right);
+		rightSide.enemy = leftSide;
+		leftSide.enemy = rightSide;
 	}
 	
 	/**
@@ -68,6 +70,7 @@ public class GameView {
 		private Board board;
 		private BoardView interactiveView;
 		private BoardView projectorView;
+		private GameViewSide enemy;
 
 		public GameViewSide(OfflinePlayer player, Board board, Board enemy, Location origin, BlockFace facing) {
 			this.player = player;
@@ -76,6 +79,14 @@ public class GameView {
 			this.projectorView = new BoardView(enemy, origin, facing);
 			this.projectorView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
 			this.projectorView.setLocationStrategy(BoardLocationStrategy.VERTICAL);
+		}
+		
+		/**
+		 * Returns the other GameViewSide
+		 * @return the other side
+		 */
+		public GameViewSide getEnemy() {
+			return enemy;
 		}
 
 		/**

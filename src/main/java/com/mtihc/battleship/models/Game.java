@@ -27,6 +27,8 @@ public class Game implements ConfigurationSerializable {
 		
 		this.leftBoard = new Board(width, height, shipTypes);
 		this.rightBoard = new Board(width, height, shipTypes);
+		leftBoard.enemy = rightBoard;
+		rightBoard.enemy = leftBoard;
 	}
 	
 	/**
