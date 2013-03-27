@@ -41,7 +41,7 @@ public class Tile {
 	public boolean isHit() {
 		return hit;
 	}
-	
+
 	public boolean hit() throws Exception {
 		if(isHit()) {
 			throw new Exception("The tile is already hit.");
@@ -50,6 +50,11 @@ public class Tile {
 			hit = true;
 			if(hasShip()) {
 				board.onHit(this);
+				
+				if(getShip().isDestroyed()) {
+					board.onShipDestoyed(getShip());
+				}
+				
 				return true;
 			}
 			else {

@@ -55,8 +55,6 @@ public class Ship {
 			throw new Exception("Incorrect number of tiles. Expected " + tiles.length + ", got " + args.length + ".");
 		}
 		
-		board = getBoard(args);
-		
 		for (int i = 0; i < args.length; i++) {
 			Tile tile = args[i];
 			
@@ -77,18 +75,6 @@ public class Ship {
 			tiles[i] = null;
 			tile.setShip(null);
 		}
-		
-		board = null;
-	}
-	
-	private Board getBoard(Tile[] tiles) throws Exception {
-		Board result = tiles[0].getBoard();
-		for (int i = 1; i < tiles.length; i++) {
-			if(tiles[i].getBoard() != result) {
-				throw new Exception("These tiles are not from the same board.");
-			}
-		}
-		return result;
 	}
 
 }

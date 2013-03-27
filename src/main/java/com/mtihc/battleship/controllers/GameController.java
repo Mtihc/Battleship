@@ -2,11 +2,13 @@ package com.mtihc.battleship.controllers;
 
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mtihc.battleship.models.Board;
 import com.mtihc.battleship.models.Game;
 import com.mtihc.battleship.models.Ship;
+import com.mtihc.battleship.models.ShipType;
 import com.mtihc.battleship.models.Tile;
 import com.mtihc.battleship.views.GameView;
 
@@ -108,15 +110,31 @@ public class GameController implements Board.Observer {
 		
 		checkOnline();
 		
+		Player leftPlayer = getLeftPlayer().getPlayer();
+		Player rightPlayer = getRightPlayer().getPlayer();
+		
 		Location loc = view.getLeftSide().getInteractiveView().getCenterLocation();
 		loc.setY(loc.getY() - 1);
-		getLeftPlayer().getPlayer().teleport(loc);
+		leftPlayer.teleport(loc);
 		
 		loc = view.getRightSide().getInteractiveView().getCenterLocation();
 		loc.setY(loc.getY() - 1);
-		getRightPlayer().getPlayer().teleport(loc);
+		rightPlayer.teleport(loc);
 		
-		// TODO start placing ships
+		// start placing ships, 
+		// TODO save players' inventories
+		
+		// clear players' inventories
+		leftPlayer.getInventory().clear();
+		rightPlayer.getInventory().clear();
+		
+		// give ship items
+		ShipType[] ships = game.getShipTypes();
+		for (ShipType shipType : ships) {
+			leftPlayer.getInventory().addItem(shipType.getNormal().toItemStack());
+			rightPlayer.getInventory().addItem(shipType.getNormal().toItemStack());
+		}
+		
 	}
 
 	@Override
@@ -156,6 +174,9 @@ public class GameController implements Board.Observer {
 		view.getRightSide().getInteractiveView().switchViews(view.getRightSide().getProjectorView());
 		
 		// TODO start placing bombs
+		Player leftPlayer = getLeftPlayer().getPlayer();
+		Player rightPlayer = getRightPlayer().getPlayer();
+		// TODO see whos turn it is, give TNT
 	}
 
 	@Override

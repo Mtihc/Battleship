@@ -150,10 +150,6 @@ public class Board {
 	 * @param tile the tile that was hit and contains part of the ship
 	 */
 	protected void onHit(Tile tile) {
-		Ship ship = tile.getShip();
-		if(ship.isDestroyed()) {
-			onShipDestoyed(ship);
-		}
 		// notify observers
 		for (Observer observer : observers) {
 			observer.onHit(tile);
