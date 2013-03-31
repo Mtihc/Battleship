@@ -5,6 +5,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.mtihc.battleship.models.Board.Ship;
+import com.mtihc.battleship.models.Board.Tile;
 import com.mtihc.battleship.models.Game;
 import com.mtihc.battleship.models.GamePlayer;
 import com.mtihc.battleship.models.GamePlayerInventory;
@@ -18,8 +20,14 @@ public class GameController {
 	private GameView view;
 	private GamePlayerController leftPlayer;
 	private GamePlayerController rightPlayer;
+	
+	private GamePlayerController currentPlayer = null;
+	private GamePlayerController winner = null;
+	private boolean started = false;
+	private boolean stopped = false;
+	private String state = null;
 
-	public GameController(JavaPlugin plugin, Game game) {
+	GameController(JavaPlugin plugin, Game game) {
 		this.plugin = plugin;
 		this.game = game;
 		this.view = new GameView(game);
@@ -52,6 +60,84 @@ public class GameController {
 
 	public GamePlayerController getRightPlayerController() {
 		return rightPlayer;
+	}
+	
+	public GamePlayerController getCurrentPlayerController() {
+		return currentPlayer;
+	}
+	
+	public boolean isStarted() {
+		return started;
+	}
+	
+	public boolean isStopped() {
+		return stopped;
+	}
+	
+	public boolean isRunning() {
+		return started && !stopped && winner == null;
+	}
+	
+	public boolean hasWinner() {
+		return winner != null;
+	}
+	
+	public GamePlayerController getWinner() {
+		return winner;
+	}
+	
+	public String getState() {
+		return state;
+	}
+	
+	private void switchTurns() {
+		if(currentPlayer == leftPlayer) {
+			currentPlayer = rightPlayer;
+		}
+		else if(currentPlayer == rightPlayer) {
+			currentPlayer = leftPlayer;
+		}
+		else {
+			currentPlayer = rightPlayer;
+		}
+		updateState();
+	}
+	
+	protected void updateState() {
+		if(started) {
+			if(!stopped) {
+				if(!game.areAllShipsPlaced()) {
+					state = "started";
+				}
+				else {
+					if(currentPlayer == leftPlayer) {
+						state = "leftPlayer";
+					}
+					else if(currentPlayer == rightPlayer) {
+						state = "rightPlayer";
+					}
+					else {
+						currentPlayer = rightPlayer;
+						state = "rightPlayer";
+					}
+				}
+				
+			}
+			else {
+				if(winner != null) {
+					state = "ended";
+				}
+				else {
+					state = "stopped";
+				}
+			}
+		}
+		else {
+			state = null;
+		}
+		
+		
+		
 	}
 
 	/**
@@ -101,10 +187,11 @@ public class GameController {
 		loc.setY(loc.getY() + 1);
 		rightPlayer.teleport(loc);
 		
-		// save players' inventories
-		// TODO give inventories back at some point
+		// save players' inventories and locations
 		this.leftPlayer.getGamePlayer().setOriginalInventory(new GamePlayerInventory(leftPlayer.getInventory()));
+		this.leftPlayer.getGamePlayer().setOriginalLocation(leftPlayer.getLocation());
 		this.rightPlayer.getGamePlayer().setOriginalInventory(new GamePlayerInventory(rightPlayer.getInventory()));
+		this.rightPlayer.getGamePlayer().setOriginalLocation(rightPlayer.getLocation());
 		
 		// clear players' inventories
 		leftPlayer.getInventory().clear();
@@ -118,6 +205,70 @@ public class GameController {
 		}
 		leftPlayer.updateInventory();
 		rightPlayer.updateInventory();
+		
+		started = true;
+		updateState();
+	}
+	
+	public void stop() {
+		stop(null);
+	}
+	
+	public void stop(GamePlayerController winner) {
+		this.winner = winner;
+		
+		stopped = true;
+		updateState();
+		
+		Player left = leftPlayer.getPlayer().getPlayer();
+		Player right = rightPlayer.getPlayer().getPlayer();
+		
+		// give original inventory back
+		leftPlayer.getGamePlayer().getOriginalInventory().setToBukkitInventory(left.getInventory());
+		rightPlayer.getGamePlayer().getOriginalInventory().setToBukkitInventory(right.getInventory());
+		left.updateInventory();
+		right.updateInventory();
+		
+		// teleport to original location
+		left.teleport(leftPlayer.getGamePlayer().getOriginalLocation());
+		right.teleport(rightPlayer.getGamePlayer().getOriginalLocation());
+		
+		// remove from manager's lists
+		GameManager.getInstance().games.remove(game.getId());
+		GameManager.getInstance().players.remove(left.getName());
+		GameManager.getInstance().players.remove(right.getName());
+	}
+
+	protected void onShipPlace(GamePlayerController gamePlayerController, Ship ship) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void onPlayerReady(GamePlayerController gamePlayerController) {
+		updateState();
+	}
+
+	protected void onShipRemove(Ship ship, Tile[] shipTiles) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void onHit(GamePlayerController gamePlayerController, Tile tile) {
+		switchTurns();
+	}
+
+	protected void onShipDestroyed(GamePlayerController gamePlayerController,
+			Ship ship) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void onAllShipsDestroyed(GamePlayerController gamePlayerController) {
+		stop(gamePlayerController.getEnemyController());
+	}
+
+	protected void onMiss(Tile tile) {
+		switchTurns();
 	}
 
 }

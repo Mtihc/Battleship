@@ -1,5 +1,6 @@
 package com.mtihc.battleship.models;
 
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 
 import com.mtihc.battleship.models.Game.GameBoard;
@@ -8,6 +9,7 @@ public class GamePlayer {
 
 	private OfflinePlayer player;
 	private GamePlayerInventory inventory;
+	private Location location;
 	
 	GameBoard board;
 
@@ -37,6 +39,14 @@ public class GamePlayer {
 	
 	public void setOriginalInventory(GamePlayerInventory inventory) {
 		this.inventory = inventory;
+	}
+
+	public Location getOriginalLocation() {
+		return location;
+	}
+
+	public void setOriginalLocation(Location location) {
+		this.location = location;
 	}
 	
 }

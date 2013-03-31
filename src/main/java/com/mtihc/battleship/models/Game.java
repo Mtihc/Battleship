@@ -81,4 +81,8 @@ public class Game extends GameData {
 			return true;
 		}
 	}
+
+	public boolean areAllShipsPlaced() {
+		return leftBoard.areAllShipsPlaced() && rightBoard.areAllShipsPlaced();
+	}
 }

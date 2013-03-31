@@ -61,7 +61,9 @@ public class GamePlayerController {
 			}
 			else /*if(view.getOtherSideView().getGameBoard().areAllShipsPlaced())*/ {
 				// ships are placed on both sides
-				placeBomb(event);
+				if(controller.getCurrentPlayerController() == this) {
+					placeBomb(event);
+				}
 			}
 		}
 		else if(event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
@@ -170,7 +172,8 @@ public class GamePlayerController {
 		// 
 		// Notify observers?
 		// 
-		// TODO onShipPlace(ship);
+		// TODO onShipPlace
+		controller.onShipPlace(this, ship);
 		
 		// 
 		// Move your ships to the vertical board
@@ -181,7 +184,8 @@ public class GamePlayerController {
 				@Override
 				public void run() {
 					view.switchViews();
-					// TODO onPlayerReady(GamePlayerController.this);
+					// TODO onPlayerReady
+					controller.onPlayerReady(GamePlayerController.this);
 				}
 			}, 60);
 		}
@@ -227,7 +231,8 @@ public class GamePlayerController {
 		// 
 		// Notify observers
 		// 
-		// TODO onShipRemove(ship, shipTiles);
+		// TODO onRemove
+		controller.onShipRemove(ship, shipTiles);
 	}
 	
 	private void placeBomb(PlayerInteractEvent event) {
@@ -302,23 +307,23 @@ public class GamePlayerController {
 		// 
 		if(tile.hasShip()) {
 			// TODO onHit
-//			onHit(tile);
+			controller.onHit(this, tile);
 			Ship ship = tile.getShip();
 			if(ship.isDestroyed()) {
 				// TODO onShipDestroyed
-//				onShipDestroyed(ship);
+				controller.onShipDestroyed(this, ship);
 				
 				if(board.areAllShipsDestroyed()) {
 					// TODO onAllShipsDestroyed
-//					onAllShipsDestroyed();
+					controller.onAllShipsDestroyed(this);
+					return;
 				}
 			}
 		}
 		else {
 			// TOODO onMiss
-//			onMiss(tile);
+			controller.onMiss(tile);
 		}
-		
 	}
 	
 

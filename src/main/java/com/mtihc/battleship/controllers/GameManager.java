@@ -30,8 +30,8 @@ public class GameManager {
 	
 	private JavaPlugin plugin;
 	private GameDataRepository repo;
-	private HashMap<String, GameController> games = new HashMap<String, GameController>();
-	private HashMap<String, GamePlayerController> players = new HashMap<String, GamePlayerController>();
+	HashMap<String, GameController> games = new HashMap<String, GameController>();
+	HashMap<String, GamePlayerController> players = new HashMap<String, GamePlayerController>();
 
 	/**
 	 * Constructor.
