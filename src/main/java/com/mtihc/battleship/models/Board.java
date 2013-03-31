@@ -237,15 +237,15 @@ public class Board {
 		}
 
 		public void remove() {
-			
+			for (int i = 0; i < tiles.length; i++) {
+				tiles[i].ship = null;
+			}
+
 			// TODO onShipRemove
 			onShipRemove(this);
 			
 			for (int i = 0; i < tiles.length; i++) {
-				Tile tile = tiles[i];
-
 				tiles[i] = null;
-				tile.ship = null;
 			}
 		}
 	}

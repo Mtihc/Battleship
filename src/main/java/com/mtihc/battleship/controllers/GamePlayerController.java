@@ -57,7 +57,9 @@ public class GamePlayerController {
 			}
 		}
 		else if(event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-
+			if(!controller.areAllShipsPlaced(player.getBoard())) {
+				removeShip(event);
+			}
 		}
 		else {
 			return;
@@ -68,6 +70,30 @@ public class GamePlayerController {
 		event.setCancelled(true);
 
 	}
+	
+	private void removeShip(PlayerInteractEvent event) {
+		// still in setup mode, because not all ships were placed
+		BoardView boardView = view.getInteractiveView();
+		Tile tile = boardView.locationToTile(event.getClickedBlock().getLocation());
+		
+		if(tile == null) {
+			// clicked outside of the board
+			return;
+		}
+		if(!tile.hasShip()) {
+			// there's no ship
+			return;
+		}
+		Ship ship = tile.getShip();
+		ship.remove();
+		
+		event.getPlayer().getInventory().addItem(ship.getType().getNormal().toItemStack(ship.getSize()));
+		
+
+		event.setUseInteractedBlock(Result.DENY);
+		event.setUseItemInHand(Result.DENY);
+		event.setCancelled(true);
+	}
 
 	private void placeShip(PlayerInteractEvent event) {
 		// still in setup mode, because not all ships are placed
@@ -76,30 +102,18 @@ public class GamePlayerController {
 		BoardView boardView = view.getInteractiveView();
 		Tile tile = boardView.locationToTile(event.getClickedBlock().getLocation());
 		
-		StringBuilder string = new StringBuilder();
-		string.append("player " + event.getPlayer().getName() + " clicked");
-		
 		if(tile == null) {
 			// clicked outside of the board
-			string.append(" outside the board");
 			return;
 		}
-		string.append(" inside the board");
-		Bukkit.getLogger().info("");
 		if(tile.hasShip()) {
 			// there's already a ship
-			string.append(", but there's already a ship.");
 			return;
 		}
-		string.append(", and there's no ship yet.");
-		controller.getPlugin().getLogger().info(string.toString());
 		
 		Ship[] ships = board.getShips();
 		for (int i = 0; i < ships.length; i++) {
 			Ship ship = ships[i];
-
-			Bukkit.getLogger().info("Ship similar: " + ship.getType().isSimilar(event.getItem()));
-			Bukkit.getLogger().info("Ship placed: " + ship.isPlaced());
 			if(!ship.getType().isSimilar(event.getItem()) || ship.isPlaced()) {
 				// different type of ship, or it's already placed,
 				// continue to try the next ship
@@ -111,10 +125,8 @@ public class GamePlayerController {
 			if(!placeShip(ship, tile, event.getClickedBlock(), facing)) {
 				// couldn't place this ship
 				// continue to try the next ship
-				Bukkit.getLogger().info("Ship cant be placed");
 				continue;
 			}
-			Bukkit.getLogger().info("Ship was placed!");
 
 			// remove ship items from player's inventory
 			int amountToRemove = ship.getSize();

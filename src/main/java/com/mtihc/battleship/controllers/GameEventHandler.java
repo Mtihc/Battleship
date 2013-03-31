@@ -18,7 +18,6 @@ class GameEventHandler implements Listener {
 		
 		if(mgr.hasPlayer(name)) {
 			GamePlayerController player = mgr.getPlayer(name);
-			// TODO
 			player.onPlayerInteract(event);
 		}
 	}
