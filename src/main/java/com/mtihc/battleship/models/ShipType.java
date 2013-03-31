@@ -45,4 +45,21 @@ public enum ShipType {
 	public MaterialData getDamaged() {
 		return damaged;
 	}
+
+	public static ShipType[] getDefaultShipTypes() {
+		return new ShipType[] {
+				ShipType.PATROL_BOAT,
+				ShipType.PATROL_BOAT,
+				ShipType.PATROL_BOAT,
+				ShipType.PATROL_BOAT,
+				ShipType.DESTROYER,
+				ShipType.DESTROYER,
+				ShipType.DESTROYER,
+				ShipType.SUBMARINE,
+				ShipType.SUBMARINE,
+				ShipType.SUBMARINE,
+				ShipType.BATTLESHIP,
+				ShipType.AIRCRAFT_CARRIER,
+		};
+	}
 }

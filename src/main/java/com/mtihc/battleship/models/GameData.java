@@ -5,8 +5,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.util.Vector;
 
 public class GameData implements ConfigurationSerializable {
 
@@ -36,7 +39,10 @@ public class GameData implements ConfigurationSerializable {
 		this.id = (String) values.get("id");
 		this.width = (Integer) values.get("width");
 		this.height = (Integer) values.get("height");
-		this.origin = (Location) values.get("origin");
+		
+		World world = Bukkit.getWorld((String) values.get("world"));
+		Vector vec = (Vector) values.get("location");
+		this.origin = vec.toLocation(world);
 		
 		List<?> shipTypeList = (List<?>) values.get("ship-types");
 		this.shipTypes = new ShipType[shipTypeList.size()];
@@ -54,7 +60,8 @@ public class GameData implements ConfigurationSerializable {
 		values.put("id", id);
 		values.put("width", width);
 		values.put("height", height);
-		values.put("origin", origin);
+		values.put("world", origin.getWorld().getName());
+		values.put("location", origin.toVector());
 
 		ArrayList<String> shipTypeList = new ArrayList<String>();
 		for (ShipType shipType : shipTypes) {

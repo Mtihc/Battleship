@@ -1,6 +1,6 @@
 name: Battleship
 version: 0.1
-description: Play the board game Battleships, in minecraft.
+description: Play the classic game Battleships, in minecraft.
 author: Mtihc
 website: http://dev.bukkit.org/server-mods/Battleship/
 
@@ -14,4 +14,29 @@ commands:
     description: This is the main command. It shows command help.
     aliases: [bs]
     permission: battleship.help
-    usage: Execute /battleship, to get command info
+    usage: Execute /battleship, to get command help
+permissions:
+  battleship.*:
+    description: Grants permission to all battleship commands.
+    default: op
+    children:
+      battleship.help: true
+      battleship.create: true
+      battleship.delete: true
+      battleship.inviter: true
+      battleship.invitable: true
+  battleship.help:
+    description: Grant permission to display command help.
+    default: true
+  battleship.create:
+    description: Grant permission to create a new battleship game area.
+    default: false
+  battleship.delete:
+    description: Grant permission to delete a battleship game area.
+    default: false
+  battleship.inviter:
+    description: Grant permission to invite players to a battleship game.
+    default: true
+  battleship.invitable:
+    description: Grant permission to be invited to a battleship game.
+    default: true
