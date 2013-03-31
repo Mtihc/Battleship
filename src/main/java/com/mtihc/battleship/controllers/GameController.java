@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mtihc.battleship.models.Game;
 import com.mtihc.battleship.models.GamePlayer;
+import com.mtihc.battleship.models.GamePlayerInventory;
 import com.mtihc.battleship.models.ShipType;
 import com.mtihc.battleship.views.GameView;
 
@@ -88,6 +89,10 @@ public class GameController {
 		Player leftPlayer = getLeftPlayerController().getPlayer().getPlayer();
 		Player rightPlayer = getRightPlayerController().getPlayer().getPlayer();
 		
+		// 
+		// Teleport players
+		// 
+		
 		Location loc = GameView.getCenterLocation(view.getLeftSideView().getInteractiveView());
 		loc.setY(loc.getY() + 1);
 		leftPlayer.teleport(loc);
@@ -96,8 +101,10 @@ public class GameController {
 		loc.setY(loc.getY() + 1);
 		rightPlayer.teleport(loc);
 		
-		// start placing ships, 
-		// TODO save players' inventories
+		// save players' inventories
+		// TODO give inventories back at some point
+		this.leftPlayer.getGamePlayer().setOriginalInventory(new GamePlayerInventory(leftPlayer.getInventory()));
+		this.rightPlayer.getGamePlayer().setOriginalInventory(new GamePlayerInventory(rightPlayer.getInventory()));
 		
 		// clear players' inventories
 		leftPlayer.getInventory().clear();

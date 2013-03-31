@@ -4,7 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
 import com.mtihc.battleship.models.Board;
-import com.mtihc.battleship.models.Board.Ship;
 import com.mtihc.battleship.models.Board.Tile;
 
 public class BoardView {
@@ -15,8 +14,6 @@ public class BoardView {
 
 	private BoardLocationStrategy locationStrategy;
 	private BoardDrawStrategy drawStrategy;
-	
-	private BoardObserver observer = new BoardObserver();
 
 	public BoardView(Board board, Location origin, BlockFace face) {
 		setBoard(board);
@@ -42,15 +39,7 @@ public class BoardView {
 	 * @param board the board model to set
 	 */
 	public void setBoard(Board board) {
-		if(this.board != board) {
-			if(this.board != null) {
-				this.board.removeObserver(observer);
-			}
-			if(board != null) {
-				board.addObserver(observer);
-			}
-			this.board = board;
-		}
+		this.board = board;
 	}
 
 	/**
@@ -126,52 +115,6 @@ public class BoardView {
 	
 	public Tile locationToTile(Location location) {
 		return locationStrategy.locationToTile(this, location);
-	}
-	
-
-	public class BoardObserver implements Board.Observer {
-
-		@Override
-		public void onMiss(Board board, Tile tile) {
-			draw(tile.getX(), tile.getY());
-		}
-
-		@Override
-		public void onHit(Board board, Tile tile) {
-			draw(tile.getX(), tile.getY());
-		}
-
-		@Override
-		public void onShipPlace(Board board, Ship ship) {
-			Tile[] tiles = ship.getTiles();
-			for (Tile tile : tiles) {
-				draw(tile.getX(), tile.getY());
-			}
-		}
-
-		@Override
-		public void onAllShipsPlaced(Board board) {
-			
-		}
-
-		@Override
-		public void onShipRemove(Board board, Ship ship) {
-			Tile[] tiles = ship.getTiles();
-			for (Tile tile : tiles) {
-				draw(tile.getX(), tile.getY());
-			}
-		}
-
-		@Override
-		public void onShipDestroyed(Board board, Ship ship) {
-			
-		}
-
-		@Override
-		public void onAllShipsDestroyed(Board board) {
-			
-		}
-
 	}
 
 }

@@ -4,8 +4,6 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
 import com.mtihc.battleship.models.Board;
-import com.mtihc.battleship.models.Board.Ship;
-import com.mtihc.battleship.models.Board.Tile;
 import com.mtihc.battleship.models.Game;
 import com.mtihc.battleship.models.Game.GameBoard;
 
@@ -16,14 +14,9 @@ public class GameView {
 	private GameSideView rightSide;
 	
 	private BlockFace face;
-	
-	private BoardObserver observer = new BoardObserver();
 
 	public GameView(Game game) {
 		this.game = game;
-		
-		game.getLeftBoard().addObserver(observer);
-		game.getRightBoard().addObserver(observer);
 		
 		Location origin = game.getOrigin();
 		
@@ -202,50 +195,5 @@ public class GameView {
 		result.setYaw(faceToYaw(boardView.getFace()));
 		result.setPitch(0);
 		return result;
-	}
-	
-
-	class BoardObserver implements Board.Observer {
-
-		@Override
-		public void onMiss(Board board, Tile tile) {
-			
-		}
-
-		@Override
-		public void onHit(Board board, Tile tile) {
-			
-		}
-
-		@Override
-		public void onShipPlace(Board board, Ship ship) {
-			
-		}
-
-		@Override
-		public void onAllShipsPlaced(Board board) {
-			if(board == game.getLeftBoard()) {
-				leftSide.switchViews();
-			}
-			else if(board == game.getRightBoard()) {
-				rightSide.switchViews();
-			}
-		}
-
-		@Override
-		public void onShipRemove(Board board, Ship ship) {
-			
-		}
-
-		@Override
-		public void onShipDestroyed(Board board, Ship ship) {
-			
-		}
-
-		@Override
-		public void onAllShipsDestroyed(Board board) {
-			
-		}
-		
 	}
 }

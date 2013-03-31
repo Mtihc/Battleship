@@ -35,7 +35,7 @@ public enum ShipType {
 	}
 	
 	public boolean isSimilar(ItemStack item) {
-		return item != null && normal.getItemTypeId() == item.getTypeId() && normal.getData() == item.getData().getData();
+		return item != null && normal.getItemTypeId() == item.getTypeId() && normal.getData() == item.getData().getData() && item.getAmount() >= size;
 	}
 
 	public MaterialData getNormal() {

@@ -1,14 +1,13 @@
 package com.mtihc.battleship.models;
 
 import org.bukkit.OfflinePlayer;
-import org.bukkit.inventory.ItemStack;
 
 import com.mtihc.battleship.models.Game.GameBoard;
 
 public class GamePlayer {
 
 	private OfflinePlayer player;
-	private Inventory inventory;
+	private GamePlayerInventory inventory;
 	
 	GameBoard board;
 
@@ -32,40 +31,12 @@ public class GamePlayer {
 		return board.getGame();
 	}
 	
-	public Inventory getOriginalInventory() {
+	public GamePlayerInventory getOriginalInventory() {
 		return inventory;
 	}
 	
-	public void setOriginalInventory(Inventory inventory) {
+	public void setOriginalInventory(GamePlayerInventory inventory) {
 		this.inventory = inventory;
-	}
-	
-	public class Inventory {
-		
-		private ItemStack[] contents;
-		private ItemStack[] armorContents;
-		
-		public Inventory(org.bukkit.inventory.PlayerInventory inventory) {
-			this(inventory.getContents(), inventory.getArmorContents());
-		}
-
-		public Inventory(ItemStack[] contents, ItemStack[] armorContents) {
-			this.contents = contents;
-			this.armorContents = armorContents;
-		}
-		
-		public ItemStack[] getContents() {
-			return contents;
-		}
-		
-		public ItemStack[] getArmorContents() {
-			return armorContents;
-		}
-		
-		public void setToBukkitInventory(org.bukkit.inventory.PlayerInventory inventory) {
-			inventory.setContents(contents);
-			inventory.setArmorContents(armorContents);
-		}
 	}
 	
 }

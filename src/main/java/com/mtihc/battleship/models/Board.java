@@ -1,6 +1,5 @@
 package com.mtihc.battleship.models;
 
-import java.util.LinkedHashSet;
 
 public class Board {
 	
@@ -131,6 +130,10 @@ public class Board {
 		public boolean isHit() {
 			return hit;
 		}
+
+		public void setHit(boolean hit) {
+			this.hit = hit;
+		}
 		
 		public boolean hasShip() {
 			return ship != null;
@@ -138,30 +141,6 @@ public class Board {
 
 		public Ship getShip() {
 			return ship;
-		}
-		
-		public void hit() {
-			if(hit) {
-				return;
-			}
-			hit = true;
-			if(hasShip()) {
-				// TODO onHit
-				onHit(this);
-				if(ship.isDestroyed()) {
-					// TODO onShipDestroyed
-					onShipDestroyed(ship);
-					
-					if(areAllShipsDestroyed()) {
-						// TODO onAllShipsDestroyed
-						onAllShipsDestroyed();
-					}
-				}
-			}
-			else {
-				// TOODO onMiss
-				onMiss(this);
-			}
 		}
 	}
 	
@@ -199,6 +178,25 @@ public class Board {
 		public Tile[] getTiles() {
 			return tiles.clone();
 		}
+
+		public void place(Tile[] tiles) {
+			this.tiles = new Tile[getSize()];
+			if(tiles == null || tiles.length != getSize()) {
+				return;
+			}
+			for (int i = 0; i < this.tiles.length; i++) {
+				this.tiles[i] = tiles[i];
+				this.tiles[i].ship = this;
+			}
+			
+		}
+		
+		public void remove() {
+			for (Tile tile : tiles) {
+				tile.ship = null;
+			}
+			this.tiles = new Tile[getSize()];
+		}
 		
 		public boolean isPlaced() {
 			for (int i = 0; i < tiles.length; i++) {
@@ -217,106 +215,5 @@ public class Board {
 			}
 			return true;
 		}
-		
-
-		public void place(Tile ...args) {
-			for (int i = 0; i < args.length; i++) {
-				Tile tile = args[i];
-				
-				tiles[i] = tile;
-				tile.ship = this;
-			}
-			
-			// TODO onShipPlace
-			onShipPlace(this);
-			
-			if(areAllShipsPlaced()) {
-				// TODO onAllShipsPlaced
-				onAllShipsPlaced();
-			}
-		}
-
-		public void remove() {
-			for (int i = 0; i < tiles.length; i++) {
-				tiles[i].ship = null;
-			}
-
-			// TODO onShipRemove
-			onShipRemove(this);
-			
-			for (int i = 0; i < tiles.length; i++) {
-				tiles[i] = null;
-			}
-		}
 	}
-	
-	private LinkedHashSet<Observer> observers = new LinkedHashSet<Board.Observer>();
-	
-	public void addObserver(Observer observer) {
-		observers.add(observer);
-	}
-	
-	public void removeObserver(Observer observer) {
-		observers.remove(observer);
-	}
-	
-	public interface Observer {
-		void onMiss(Board board, Tile tile);
-		void onHit(Board board, Tile tile);
-		void onShipPlace(Board board, Ship ship);
-		void onAllShipsPlaced(Board board);
-		void onShipRemove(Board board, Ship ship);
-		void onShipDestroyed(Board board, Ship ship);
-		void onAllShipsDestroyed(Board board);
-	}
-
-	protected void onMiss(Tile tile) {
-		Observer[] os = observers.toArray(new Observer[observers.size()]);
-		for (Observer observer : os) {
-			observer.onMiss(this, tile);
-		}
-	}
-
-	protected void onHit(Tile tile) {
-		Observer[] os = observers.toArray(new Observer[observers.size()]);
-		for (Observer observer : os) {
-			observer.onHit(this, tile);
-		}
-	}
-
-	protected void onShipPlace(Ship ship) {
-		Observer[] os = observers.toArray(new Observer[observers.size()]);
-		for (Observer observer : os) {
-			observer.onShipPlace(this, ship);
-		}
-	}
-
-	protected void onAllShipsPlaced() {
-		Observer[] os = observers.toArray(new Observer[observers.size()]);
-		for (Observer observer : os) {
-			observer.onAllShipsPlaced(this);
-		}
-	}
-
-	protected void onShipRemove(Ship ship) {
-		Observer[] os = observers.toArray(new Observer[observers.size()]);
-		for (Observer observer : os) {
-			observer.onShipRemove(this, ship);
-		}
-	}
-
-	protected void onShipDestroyed(Ship ship) {
-		Observer[] os = observers.toArray(new Observer[observers.size()]);
-		for (Observer observer : os) {
-			observer.onShipDestroyed(this, ship);
-		}
-	}
-
-	protected void onAllShipsDestroyed() {
-		Observer[] os = observers.toArray(new Observer[observers.size()]);
-		for (Observer observer : os) {
-			observer.onAllShipsDestroyed(this);
-		}
-	}
-	
 }
