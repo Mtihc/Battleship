@@ -1,13 +1,17 @@
 package com.mtihc.battleship.controllers;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import com.mtihc.battleship.models.Board;
 import com.mtihc.battleship.models.Board.Ship;
@@ -51,14 +55,22 @@ public class GamePlayerController {
 	}
 
 	protected void onPlayerInteract(PlayerInteractEvent event) {
+		
 		if(event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-			if(!controller.areAllShipsPlaced(player.getBoard())) {
+			if(!view.getGameBoard().areAllShipsPlaced()) {
 				placeShip(event);
+			}
+			else /*if(view.getOtherSideView().getGameBoard().areAllShipsPlaced())*/ {
+				// ships are placed on both sides
+				placeBomb(event);
 			}
 		}
 		else if(event.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-			if(!controller.areAllShipsPlaced(player.getBoard())) {
+			if(!view.getGameBoard().areAllShipsPlaced()) {
 				removeShip(event);
+			}
+			else if(view.getOtherSideView().getGameBoard().areAllShipsPlaced()) {
+				// ships are placed on both sides
 			}
 		}
 		else {
@@ -69,6 +81,37 @@ public class GamePlayerController {
 		event.setUseItemInHand(Result.DENY);
 		event.setCancelled(true);
 
+	}
+	
+	private void placeBomb(PlayerInteractEvent event) {
+		BoardView boardView = view.getInteractiveView();
+		Tile tile = boardView.locationToTile(event.getClickedBlock().getLocation());
+		
+		if(tile == null) {
+			return;
+		}
+		final Tile enemyTile = player.getBoard().getOtherBoard().getTile(tile.getX(), tile.getY());
+		if(enemyTile.isHit()) {
+			return;
+		}
+		
+		Location loc = event.getClickedBlock().getLocation();
+		loc.setY(loc.getY() + 1);
+		loc.setX(loc.getX() + 0.5);
+		loc.setZ(loc.getZ() + 0.5);
+		TNTPrimed primedTnt = (TNTPrimed) loc.getWorld().spawnEntity(loc, EntityType.PRIMED_TNT);
+		primedTnt.setIsIncendiary(false);
+		primedTnt.setYield(0);
+		primedTnt.setVelocity(new Vector(0, 0.25, 0));
+		primedTnt.setFuseTicks(40);
+		
+		Bukkit.getScheduler().scheduleSyncDelayedTask(controller.getPlugin(), new Runnable() {
+			
+			@Override
+			public void run() {
+				enemyTile.hit();
+			}
+		}, primedTnt.getFuseTicks());
 	}
 	
 	private void removeShip(PlayerInteractEvent event) {

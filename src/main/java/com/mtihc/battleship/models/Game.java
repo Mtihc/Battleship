@@ -1,6 +1,7 @@
 package com.mtihc.battleship.models;
 
 
+
 public class Game extends GameData {
 	
 	private GameBoard leftBoard;
@@ -50,5 +51,34 @@ public class Game extends GameData {
 			return enemy;
 		}
 		
+
+
+		/**
+		 * Returns whether all ships are placed on the board
+		 * @return true if all ships are placed, false otherwise
+		 */
+		public boolean areAllShipsPlaced() {
+			Ship[] ships = player.getBoard().getShips();
+			for (Ship ship : ships) {
+				if(!ship.isPlaced()) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/**
+		 * Returns wether all ships are destroyed on the board
+		 * @return true if all ships are destroyed, false otherwise
+		 */
+		public boolean areAllShipsDestroyed() {
+			Ship[] ships = player.getBoard().getShips();
+			for (Ship ship : ships) {
+				if(!ship.isDestroyed()) {
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 }

@@ -5,8 +5,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.mtihc.battleship.models.Board;
-import com.mtihc.battleship.models.Board.Ship;
 import com.mtihc.battleship.models.Game;
 import com.mtihc.battleship.models.GamePlayer;
 import com.mtihc.battleship.models.ShipType;
@@ -72,36 +70,6 @@ public class GameController {
 		else if(!right.isOnline()) {
 			throw new GameException(right.getName() + " is offline.");
 		}
-	}
-
-	/**
-	 * Returns whether all ships are placed on a board
-	 * @param board the board
-	 * @return true if all ships are placed, false otherwise
-	 */
-	public boolean areAllShipsPlaced(Board board) {
-		Ship[] ships = board.getShips();
-		for (Ship ship : ships) {
-			if(!ship.isPlaced()) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Returns wether all ships are destroyed on a board
-	 * @param board the board
-	 * @return true if all ships are destroyed, false otherwise
-	 */
-	public boolean areAllShipsDestroyed(Board board) {
-		Ship[] ships = board.getShips();
-		for (Ship ship : ships) {
-			if(!ship.isDestroyed()) {
-				return false;
-			}
-		}
-		return true;
 	}
 	
 	/**
