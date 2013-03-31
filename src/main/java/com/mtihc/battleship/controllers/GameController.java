@@ -175,6 +175,15 @@ public class GameController {
 		Player leftPlayer = getLeftPlayerController().getPlayer().getPlayer();
 		Player rightPlayer = getRightPlayerController().getPlayer().getPlayer();
 		
+
+		
+		// save players' inventories and locations
+		this.leftPlayer.getGamePlayer().setOriginalInventory(new GamePlayerInventory(leftPlayer.getInventory()));
+		this.leftPlayer.getGamePlayer().setOriginalLocation(leftPlayer.getLocation());
+		this.rightPlayer.getGamePlayer().setOriginalInventory(new GamePlayerInventory(rightPlayer.getInventory()));
+		this.rightPlayer.getGamePlayer().setOriginalLocation(rightPlayer.getLocation());
+		
+		
 		// 
 		// Teleport players
 		// 
@@ -187,11 +196,6 @@ public class GameController {
 		loc.setY(loc.getY() + 1);
 		rightPlayer.teleport(loc);
 		
-		// save players' inventories and locations
-		this.leftPlayer.getGamePlayer().setOriginalInventory(new GamePlayerInventory(leftPlayer.getInventory()));
-		this.leftPlayer.getGamePlayer().setOriginalLocation(leftPlayer.getLocation());
-		this.rightPlayer.getGamePlayer().setOriginalInventory(new GamePlayerInventory(rightPlayer.getInventory()));
-		this.rightPlayer.getGamePlayer().setOriginalLocation(rightPlayer.getLocation());
 		
 		// clear players' inventories
 		leftPlayer.getInventory().clear();
@@ -267,7 +271,7 @@ public class GameController {
 		stop(gamePlayerController.getEnemyController());
 	}
 
-	protected void onMiss(Tile tile) {
+	protected void onMiss(GamePlayerController gamePlayerController, Tile tile) {
 		switchTurns();
 	}
 

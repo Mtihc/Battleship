@@ -59,7 +59,7 @@ public class GamePlayerController {
 			if(!view.getGameBoard().areAllShipsPlaced()) {
 				placeShip(event);
 			}
-			else /*if(view.getOtherSideView().getGameBoard().areAllShipsPlaced())*/ {
+			else if(view.getOtherSideView().getGameBoard().areAllShipsPlaced()) {
 				// ships are placed on both sides
 				if(controller.getCurrentPlayerController() == this) {
 					placeBomb(event);
@@ -322,7 +322,7 @@ public class GamePlayerController {
 		}
 		else {
 			// TOODO onMiss
-			controller.onMiss(tile);
+			controller.onMiss(this, tile);
 		}
 	}
 	
