@@ -1,130 +1,54 @@
 package com.mtihc.battleship.models;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.bukkit.Location;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-
-public class Game implements ConfigurationSerializable {
+public class Game extends GameData {
 	
-	private String id;
-	private int width;
-	private int height;
-	private Location origin;
-	private ShipType[] shipTypes;
-	private Board leftBoard;
-	private Board rightBoard;
-	
-	public Game(String id, int width, int height, Location origin, ShipType[] shipTypes) {
-		this.id = id;
-		this.width = width;
-		this.height = height;
-		this.origin = origin;
-		this.shipTypes = shipTypes;
-		
-		init();
-	}
-	
-	/**
-	 * Constructor used for deserialization
-	 * @param values the loaded values
-	 */
-	public Game(Map<String, Object> values) {
-		this.id = (String) values.get("id");
-		this.width = (Integer) values.get("width");
-		this.height = (Integer) values.get("height");
-		this.origin = (Location) values.get("origin");
-		
-		List<?> shipTypeList = (List<?>) values.get("ship-types");
-		this.shipTypes = new ShipType[shipTypeList.size()];
-		int i = 0;
-		for (Object object : shipTypeList) {
-			ShipType shipType = ShipType.valueOf(object.toString());
-			this.shipTypes[i] = shipType;
-			i++;
-		}
-		
-		init();
-	}
+	private GameBoard leftBoard;
+	private GameBoard rightBoard;
 
-	@Override
-	public Map<String, Object> serialize() {
-		LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("id", id);
-		values.put("width", width);
-		values.put("height", height);
-		values.put("origin", origin);
-
-		ArrayList<String> shipTypeList = new ArrayList<String>();
-		for (ShipType shipType : shipTypes) {
-			shipTypeList.add(shipType.name());
-		}
-		
-		values.put("ship-types", shipTypeList);
-		
-		return values;
-	}
-
-	private void init() {
-		this.leftBoard = new Board(this);
-		this.rightBoard = new Board(this);
+	public Game(GameData data, GamePlayer leftPlayer, GamePlayer rightPlayer) {
+		super(data);
+		leftBoard = new GameBoard(leftPlayer);
+		rightBoard = new GameBoard(rightPlayer);
 		leftBoard.enemy = rightBoard;
 		rightBoard.enemy = leftBoard;
+		leftPlayer.board = leftBoard;
+		rightPlayer.board = rightBoard;
 	}
 	
-	public String getId() {
-		return id;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	public Location getOrigin() {
-		return origin;
-	}
-
-	public void setOrigin(Location origin) {
-		this.origin = origin;
-	}
-
-	public ShipType[] getShipTypes() {
-		return shipTypes;
-	}
-
-	public void setShipTypes(ShipType[] shipTypes) {
-		this.shipTypes = shipTypes;
-	}
-	
-	public Board getLeftBoard() {
+	public GameBoard getLeftBoard() {
 		return leftBoard;
 	}
 	
-	public Board getRightBoard() {
+	public GameBoard getRightBoard() {
 		return rightBoard;
 	}
-	
-	public boolean areAllShipsPlaced() {
-		return leftBoard.areAllShipsPlaced() && rightBoard.areAllShipsPlaced();
-	}
-	
-	public boolean areAllShipsDestroyed() {
-		return leftBoard.areAllShipsDestroyed() && rightBoard.areAllShipsDestroyed();
-	}
 
+	public class GameBoard extends Board {
+
+		private GamePlayer player;
+		private GameBoard enemy;
+
+		GameBoard(GamePlayer player) {
+			super(
+					Game.this.getWidth(), 
+					Game.this.getHeight(), 
+					Game.this.getShipTypes());
+			
+			this.player = player;
+		}
+		
+		public Game getGame() {
+			return Game.this;
+		}
+		
+		public GamePlayer getGamePlayer() {
+			return player;
+		}
+
+		public GameBoard getOtherBoard() {
+			return enemy;
+		}
+		
+	}
 }

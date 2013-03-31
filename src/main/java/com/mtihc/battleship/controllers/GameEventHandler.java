@@ -4,7 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-public class GameEventHandler implements Listener {
+class GameEventHandler implements Listener {
 
 	private GameManager mgr;
 
@@ -17,7 +17,8 @@ public class GameEventHandler implements Listener {
 		String name = event.getPlayer().getName();
 		
 		if(mgr.hasPlayer(name)) {
-			GamePlayer player = mgr.getPlayer(name);
+			GamePlayerController player = mgr.getPlayer(name);
+			// TODO
 			player.onPlayerInteract(event);
 		}
 	}

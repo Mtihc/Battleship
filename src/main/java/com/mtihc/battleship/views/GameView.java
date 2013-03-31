@@ -1,150 +1,251 @@
 package com.mtihc.battleship.views;
 
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.BlockFace;
 
 import com.mtihc.battleship.models.Board;
+import com.mtihc.battleship.models.Board.Ship;
+import com.mtihc.battleship.models.Board.Tile;
 import com.mtihc.battleship.models.Game;
+import com.mtihc.battleship.models.Game.GameBoard;
 
 public class GameView {
-
-	private GameViewSide leftSide;
-	private GameViewSide rightSide;
 	
-	private BlockFace forward;
-	private BlockFace left;
-	private BlockFace right;
+	private Game game;
+	private GameSideView leftSide;
+	private GameSideView rightSide;
+	
+	private BlockFace face;
+	
+	private BoardObserver observer = new BoardObserver();
 
-	public GameView(Game game, OfflinePlayer leftPlayer, OfflinePlayer rightPlayer) {
-		// create boards (model)
-		Board leftBoard = game.getLeftBoard();
-		Board rightBoard = game.getRightBoard();
+	public GameView(Game game) {
+		this.game = game;
+		
+		game.getLeftBoard().addObserver(observer);
+		game.getRightBoard().addObserver(observer);
 		
 		Location origin = game.getOrigin();
 		
 		// set facing directions
-		forward = BoardView.yawToFace(origin.getYaw());
-		left = BoardView.yawToFace(origin.getYaw() - 90);
-		right = BoardView.yawToFace(origin.getYaw() + 90);
+		face = yawToFace(origin.getYaw());
+		BlockFace left = yawToFace(origin.getYaw() - 90);
+		BlockFace right = yawToFace(origin.getYaw() + 90);
 		
 		//
 		// set origin locations for the views at the top-left (relative to their facing direction)
 		// 
 		// left side's origin is a little to the left and all the way forward
-		Location leftOrigin = origin.getBlock().getRelative(left, 3).getRelative(forward, game.getWidth()).getLocation();
+		Location leftOrigin = origin.getBlock().getRelative(left, 3).getRelative(face, game.getWidth()).getLocation();
+		leftOrigin.setYaw(origin.getYaw() + 90);
 		// right side's origin is a little to the right and that's about it. 
-		Location rightOrigin = origin.getBlock().getRelative(right, 3).getRelative(forward, 1).getLocation();
+		Location rightOrigin = origin.getBlock().getRelative(right, 3).getRelative(face, 1).getLocation();
+		rightOrigin.setYaw(origin.getYaw() - 90);
 		
-		leftSide = new GameViewSide(leftPlayer, leftBoard, rightBoard, leftOrigin, left);
-		rightSide = new GameViewSide(rightPlayer, rightBoard, rightBoard, rightOrigin, right);
-		rightSide.enemy = leftSide;
-		leftSide.enemy = rightSide;
+		// create GameSideViews
+		leftSide = new GameSideView(game.getLeftBoard(), leftOrigin, right);
+		rightSide = new GameSideView(game.getRightBoard(), rightOrigin, left);
+		// GameSideViews know their enemy
+		leftSide.otherSide = rightSide;
+		rightSide.otherSide = leftSide;
 	}
 	
-	/**
-	 * The left GameViewSide
-	 * @return left side of the view
-	 */
-	public GameViewSide getLeftSide() {
+	public Game getGame() {
+		return game;
+	}
+	
+	public Location getOrigin() {
+		return game.getOrigin();
+	}
+	
+	public BlockFace getFace() {
+		return face;
+	}
+	
+	public GameSideView getLeftSideView() {
 		return leftSide;
 	}
 	
-	/**
-	 * The right GameViewSide
-	 * @return right side of the view
-	 */
-	public GameViewSide getRightSide() {
+	public GameSideView getRightSideView() {
 		return rightSide;
 	}
+
 	
-	/**
-	 * Inner class of GameView. Represents one side of the view. 
-	 * 
-	 * @author Mitch
-	 *
-	 */
-	public class GameViewSide {
+	
+	
+	
+	
+	public class GameSideView {
+
+		private GameSideView otherSide;
 		
-		private OfflinePlayer player;
-		private Board board;
+		private GameBoard board;
+		private Location origin;
+		private BlockFace face;
+		
 		private BoardView interactiveView;
 		private BoardView projectorView;
-		private GameViewSide enemy;
 
-		public GameViewSide(OfflinePlayer player, Board board, Board enemy, Location origin, BlockFace facing) {
-			this.player = player;
+		GameSideView(GameBoard board, Location origin, BlockFace face) {
 			this.board = board;
-			this.interactiveView = new BoardView(board, origin, facing);
-			this.projectorView = new BoardView(enemy, origin, facing);
+			this.origin = origin;
+			this.face = face;
+			
+			this.interactiveView = new BoardView(board, origin, face);
+			this.interactiveView.setDrawStrategy(BoardDrawStrategy.NORMAL);
+			this.interactiveView.setLocationStrategy(BoardLocationStrategy.HORIZONTAL);
+			
+			this.projectorView = new BoardView(board.getOtherBoard(), origin, face);
 			this.projectorView.setDrawStrategy(BoardDrawStrategy.HIDE_SHIPS);
 			this.projectorView.setLocationStrategy(BoardLocationStrategy.VERTICAL);
 		}
 		
-		/**
-		 * Returns the other GameViewSide
-		 * @return the other side
-		 */
-		public GameViewSide getEnemy() {
-			return enemy;
+		public GameSideView getOtherSideView() {
+			return otherSide;
 		}
-
-		/**
-		 * The player that is playing on this side of the view
-		 * @return the player
-		 */
-		public OfflinePlayer getPlayer() {
-			return player;
-		}
-
-		/**
-		 * The board model, that is being observed and displayed by this view
-		 * @return the board model
-		 */
-		public Board getBoard() {
+		
+		public GameBoard getGameBoard() {
 			return board;
 		}
+		
+		public Location getOrigin() {
+			return origin.clone();
+		}
+		
+		public BlockFace getFace() {
+			return face;
+		}
 
-		/**
-		 * The interactive board view. 
-		 * 
-		 * <p>This is the board to place your ships on. It will displaying the enemy's board later on, 
-		 * so you can place bombs on it.</p>
-		 * 
-		 * @return the interactive board view.
-		 */
 		public BoardView getInteractiveView() {
 			return interactiveView;
 		}
-
-		/**
-		 * The projector board view.
-		 * 
-		 * <p>This is the board that will be displaying your ships, 
-		 * exactly as you placed them on the interactive board view before. </p>
-		 * 
-		 * @return the projector board view
-		 */
+		
 		public BoardView getProjectorView() {
 			return projectorView;
 		}
-
+		
 		/**
-		 * Draws both board views, on this side of the game view.
+		 * Let the projector view switch models and draw strategy with the projector view.
 		 */
-		public void draw() {
+		public void switchViews() {
+			// switch draw strategy
+			BoardDrawStrategy s = interactiveView.getDrawStrategy();
+			interactiveView.setDrawStrategy(projectorView.getDrawStrategy());
+			projectorView.setDrawStrategy(s);
+			
+			// switch boards
+			Board b = interactiveView.getBoard();
+			interactiveView.setBoard(projectorView.getBoard());
+			projectorView.setBoard(b);
+			
+			// redraw
 			interactiveView.draw();
 			projectorView.draw();
 		}
 		
-		
+		public void draw() {
+			interactiveView.draw();
+			projectorView.draw();
+		}
 	}
 	
-	/**
-	 * Draws both sides of this game view.
-	 */
 	public void draw() {
 		leftSide.draw();
 		rightSide.draw();
+	}
+	
+	
+
+
+	// only using SOUTH, WEST, NORTH, EAST
+	public static final BlockFace[] axis = { BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST };
+
+	/**
+	 * Convert a yaw value to one of the following BlockFace enum values: NORTH, EAST, SOUTH or WEST.
+	 * @param yaw the yaw value
+	 * @return the BlockFace enum value
+	 */
+	public static BlockFace yawToFace(float yaw) {
+		return axis[Math.round(yaw / 90f) & 0x3];
+	}
+	
+	/**
+	 * Convert a BlockFace enum value, to a yaw value. Only accepts: NORTH, EAST, SOUTH, WEST.
+	 * Other values will result in 0, which happens to be south.
+	 * @param face the BlockFace enum value
+	 * @return the yaw value
+	 */
+	public static float faceToYaw(BlockFace face) {
+		switch(face) {
+		case EAST:
+			return -90;
+		case NORTH:
+			return 180;
+		case WEST:
+			return 90;
+		case SOUTH:
+			return 0;
+		default:
+			return 0;
+		}
+	}
+	
+
+	
+	/**
+	 * Get the center location of this board view. (assuming the horizontal location strategy is used)
+	 * 
+	 * @return the center location
+	 */
+	public static Location getCenterLocation(BoardView boardView) {
+		Location result = boardView.tileToLocation(boardView.getBoard().getWidth() / 2, boardView.getBoard().getHeight() / 2);
+		result.setYaw(faceToYaw(boardView.getFace()));
+		result.setPitch(0);
+		return result;
+	}
+	
+
+	class BoardObserver implements Board.Observer {
+
+		@Override
+		public void onMiss(Board board, Tile tile) {
+			
+		}
+
+		@Override
+		public void onHit(Board board, Tile tile) {
+			
+		}
+
+		@Override
+		public void onShipPlace(Board board, Ship ship) {
+			
+		}
+
+		@Override
+		public void onAllShipsPlaced(Board board) {
+			if(board == game.getLeftBoard()) {
+				leftSide.switchViews();
+			}
+			else if(board == game.getRightBoard()) {
+				rightSide.switchViews();
+			}
+		}
+
+		@Override
+		public void onShipRemove(Board board, Ship ship) {
+			
+		}
+
+		@Override
+		public void onShipDestroyed(Board board, Ship ship) {
+			
+		}
+
+		@Override
+		public void onAllShipsDestroyed(Board board) {
+			
+		}
+		
 	}
 }

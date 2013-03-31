@@ -4,7 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 
-import com.mtihc.battleship.models.Tile;
+import com.mtihc.battleship.models.Board.Tile;
 
 public abstract class BoardLocationStrategy {
 
@@ -14,9 +14,9 @@ public abstract class BoardLocationStrategy {
 		public Location tileToLocation(BoardView board, int x, int y) {
 			Location origin = board.getOrigin();
 			World world = origin.getWorld();
-			origin = origin.getBlock().getRelative(board.getFacingDirection(), 2).getRelative(BlockFace.UP, board.getBoard().getHeight() + 1).getLocation();
+			origin = origin.getBlock().getRelative(board.getFace(), 2).getRelative(BlockFace.UP, board.getBoard().getHeight() + 1).getLocation();
 
-			switch (board.getFacingDirection()) {
+			switch (board.getFace()) {
 			case NORTH:
 				return new Location(world, origin.getBlockX() + x, origin.getBlockY() - y, origin.getBlockZ());
 			case SOUTH:
@@ -35,7 +35,7 @@ public abstract class BoardLocationStrategy {
 			Location origin = board.getOrigin();
 
 			try {
-				switch (board.getFacingDirection()) {
+				switch (board.getFace()) {
 				case NORTH:
 					return board.getBoard().getTile(
 							Math.abs(location.getBlockX() - origin.getBlockX()), 
@@ -69,7 +69,7 @@ public abstract class BoardLocationStrategy {
 			Location origin = board.getOrigin();
 			World world = origin.getWorld();
 
-			switch (board.getFacingDirection()) {
+			switch (board.getFace()) {
 			case NORTH:
 				return new Location(world, 
 						origin.getBlockX() + x, 
@@ -100,7 +100,7 @@ public abstract class BoardLocationStrategy {
 			Location origin = board.getOrigin();
 
 			try {
-				switch (board.getFacingDirection()) {
+				switch (board.getFace()) {
 				case NORTH:
 					return board.getBoard().getTile(
 							Math.abs(location.getBlockX() - origin.getBlockX()), 

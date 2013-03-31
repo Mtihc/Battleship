@@ -1,16 +1,17 @@
 package com.mtihc.battleship;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.mtihc.battleship.controllers.GameController;
 import com.mtihc.battleship.controllers.GameException;
 import com.mtihc.battleship.controllers.GameManager;
-import com.mtihc.battleship.controllers.InvitationManager;
-import com.mtihc.battleship.models.Game;
-import com.mtihc.battleship.models.GameRepository;
-import com.mtihc.battleship.models.GameYamlRepository;
+import com.mtihc.battleship.models.GameData;
+import com.mtihc.battleship.models.GameDataYamlRepository;
 import com.mtihc.battleship.models.ShipType;
 
 public class BattleshipPlugin extends JavaPlugin {
@@ -19,19 +20,11 @@ public class BattleshipPlugin extends JavaPlugin {
 	public void onEnable() {
 		saveDefaultConfig();
 		
-		// create game yml repository
-		String directory = getDataFolder() + "/games";
-		GameRepository repository = new GameYamlRepository(directory);
-		
-		// create managers
 		try {
-			new InvitationManager(this);
-			new GameManager(this, repository);
+			new GameManager(this, new GameDataYamlRepository(getDataFolder() + "/games"));
+		} catch (Exception e) {
+			// game manager already exists
 		}
-		catch(Exception e) {
-			// already exist
-		}
-		
 		
 	}
 
@@ -50,6 +43,7 @@ public class BattleshipPlugin extends JavaPlugin {
 				subcommand = args[0];
 				// TODO add commands
 				if(subcommand.equalsIgnoreCase("start")) {
+					Bukkit.getLogger().info("start command!");
 					Player player = (Player) sender;
 					ShipType[] shipTypes = new ShipType[] {
 							ShipType.PATROL_BOAT,
@@ -65,13 +59,15 @@ public class BattleshipPlugin extends JavaPlugin {
 							ShipType.BATTLESHIP,
 							ShipType.AIRCRAFT_CARRIER,
 					};
-					Game game = new Game("test", 10, 10, player.getLocation(), shipTypes);
-					// TODO invite/challenge system
+					GameData data = new GameData("test", 10, 10, player.getLocation(), shipTypes);
 					try {
-						GameManager.getInstance().createController(game, player, player).initialize();
+						GameController controller = GameManager.getInstance().createController(data, player, player);
+						controller.start();
 					} catch (GameException e) {
-						sender.sendMessage(e.getMessage());
+						player.sendMessage(ChatColor.RED + e.getMessage());
+						return true;
 					}
+					
 				}
 				else {
 					sender.sendMessage("Unknown command: /battleship " + subcommand);

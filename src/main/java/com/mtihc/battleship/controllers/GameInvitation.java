@@ -8,14 +8,14 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 
-import com.mtihc.battleship.models.Game;
+import com.mtihc.battleship.models.GameData;
 
 public class GameInvitation extends Invitation {
 
 	private String gameId;
 	private String acceptCommandUsage;
 	private String denyCommandUsage;
-	private Game game;
+	private GameData gameData;
 
 	public GameInvitation(Player sender, String receiverName, String gameId) {
 		this(sender, receiverName, gameId, 1200L);
@@ -39,9 +39,9 @@ public class GameInvitation extends Invitation {
 			throw new InvitationException("Somebody is already playing \"" + gameId + "\".");
 		}
 
-		Game game;
+		GameData gameData;
 		try {
-			game = mgr.getGameRepository().getGame(gameId);
+			gameData = mgr.getGameRepository().getGame(gameId);
 		} catch (IOException e) {
 			String message = "Failed to load game \"" + gameId + "\" due to IOException.";
 			mgr.getPlugin().getLogger().log(Level.WARNING, message, e);
@@ -52,7 +52,7 @@ public class GameInvitation extends Invitation {
 			throw new InvitationException(message);
 		}
 
-		if (game == null) {
+		if (gameData == null) {
 			throw new InvitationException("Game \"" + gameId + "\" does not exist.");
 		}
 
@@ -61,7 +61,7 @@ public class GameInvitation extends Invitation {
 				ChatColor.GOLD + "  To accept the invitation, type " + ChatColor.WHITE + getAcceptCommandUsage(),
 				ChatColor.GOLD + "  To deny the invitation, type " + ChatColor.WHITE + getDenyCommandUsage() });
 
-		this.game = game;
+		this.gameData = gameData;
 		
 		if (sender.getPlayer() != null)
 			sender.getPlayer().sendMessage(ChatColor.GOLD + "The invite was sent to " + ChatColor.WHITE + receiver.getName());
@@ -80,7 +80,7 @@ public class GameInvitation extends Invitation {
 
 		// TODO initialize game
 		try {
-			mgr.createController(game, sender, receiver).initialize();
+			mgr.createController(gameData, sender, receiver).start();
 		} catch (GameException e) {
 			throw new InvitationException("Game could not be initialized due to a GameException: " + e.getMessage(), e);
 		}

@@ -6,85 +6,62 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mtihc.battleship.models.Board;
+import com.mtihc.battleship.models.Board.Ship;
 import com.mtihc.battleship.models.Game;
-import com.mtihc.battleship.models.Ship;
+import com.mtihc.battleship.models.GamePlayer;
 import com.mtihc.battleship.models.ShipType;
-import com.mtihc.battleship.models.Tile;
 import com.mtihc.battleship.views.GameView;
 
-public class GameController implements Board.Observer {
+public class GameController {
 
 	private JavaPlugin plugin;
 	private Game game;
 	private GameView view;
-	
-	GameController(JavaPlugin plugin, GamePlayer left, GamePlayer right, Game game) {
+	private GamePlayerController leftPlayer;
+	private GamePlayerController rightPlayer;
+
+	public GameController(JavaPlugin plugin, Game game) {
 		this.plugin = plugin;
 		this.game = game;
-		// relation between GameView and Game model
-		this.view = new GameView(game, left.getPlayer(), right.getPlayer());
+		this.view = new GameView(game);
 		
-		// relation between GameView and this controller
-		view.getLeftSide().getBoard().addObserver(this);
-		view.getRightSide().getBoard().addObserver(this);
+		GamePlayer leftPlayer = game.getLeftBoard().getGamePlayer();
+		GamePlayer rightPlayer = game.getRightBoard().getGamePlayer();
 		
-	}
-	
-	/**
-	 * The id of the game model
-	 * @return id of the game model
-	 */
-	public String getId() {
-		return game.getId();
+		this.leftPlayer = new GamePlayerController(this, leftPlayer, view.getLeftSideView());
+		this.rightPlayer = new GamePlayerController(this, rightPlayer, view.getRightSideView());
+		this.leftPlayer.enemy = this.rightPlayer;
+		this.rightPlayer.enemy = this.leftPlayer;
+		
 	}
 
-	/**
-	 * The plugin
-	 * @return the plugin
-	 */
 	public JavaPlugin getPlugin() {
 		return plugin;
 	}
 
-	/**
-	 * The game model
-	 * @return the game model
-	 */
 	public Game getGame() {
 		return game;
 	}
-	
-	/**
-	 * The game view
-	 * @return the game view
-	 */
-	public GameView getView() {
+
+	public GameView getGameView() {
 		return view;
 	}
 
-	/**
-	 * The left player
-	 * @return the left player
-	 */
-	public OfflinePlayer getLeftPlayer() {
-		return view.getLeftSide().getPlayer();
+	public GamePlayerController getLeftPlayerController() {
+		return leftPlayer;
 	}
 
-	/**
-	 * The right player
-	 * @return the right player
-	 */
-	public OfflinePlayer getRightPlayer() {
-		return view.getRightSide().getPlayer();
+	public GamePlayerController getRightPlayerController() {
+		return rightPlayer;
 	}
-	
+
 	/**
 	 * Throws an exception with appropriate text, when any of the players are offline.
 	 * @throws GameException when both players are offline, or either one of them
 	 */
 	public void checkOnline() throws GameException {
-		OfflinePlayer left = getLeftPlayer();
-		OfflinePlayer right = getRightPlayer();
+		OfflinePlayer left = leftPlayer.getPlayer();
+		OfflinePlayer right = rightPlayer.getPlayer();
 		
 		if(!left.isOnline() && !right.isOnline()) {
 			throw new GameException(left.getName() + " and " + right.getName() + " are both offline.");
@@ -96,29 +73,59 @@ public class GameController implements Board.Observer {
 			throw new GameException(right.getName() + " is offline.");
 		}
 	}
+
+	/**
+	 * Returns whether all ships are placed on a board
+	 * @param board the board
+	 * @return true if all ships are placed, false otherwise
+	 */
+	public boolean areAllShipsPlaced(Board board) {
+		Ship[] ships = board.getShips();
+		for (Ship ship : ships) {
+			if(!ship.isPlaced()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns wether all ships are destroyed on a board
+	 * @param board the board
+	 * @return true if all ships are destroyed, false otherwise
+	 */
+	public boolean areAllShipsDestroyed(Board board) {
+		Ship[] ships = board.getShips();
+		for (Ship ship : ships) {
+			if(!ship.isDestroyed()) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	/**
-	 * Initialize the game. 
+	 * Start the game. 
 	 * 
 	 * <p>Draws the board. Teleports players. </p>
 	 * <p>And prepares to start placing ships.</p>
 	 * 
 	 * @throws GameException
 	 */
-	public void initialize() throws GameException {
+	public void start() throws GameException {
 		view.draw();
 		
 		checkOnline();
 		
-		Player leftPlayer = getLeftPlayer().getPlayer();
-		Player rightPlayer = getRightPlayer().getPlayer();
+		Player leftPlayer = getLeftPlayerController().getPlayer().getPlayer();
+		Player rightPlayer = getRightPlayerController().getPlayer().getPlayer();
 		
-		Location loc = view.getLeftSide().getInteractiveView().getCenterLocation();
-		loc.setY(loc.getY() - 1);
+		Location loc = GameView.getCenterLocation(view.getLeftSideView().getInteractiveView());
+		loc.setY(loc.getY() + 1);
 		leftPlayer.teleport(loc);
 		
-		loc = view.getRightSide().getInteractiveView().getCenterLocation();
-		loc.setY(loc.getY() - 1);
+		loc = GameView.getCenterLocation(view.getRightSideView().getInteractiveView());
+		loc.setY(loc.getY() + 1);
 		rightPlayer.teleport(loc);
 		
 		// start placing ships, 
@@ -131,57 +138,11 @@ public class GameController implements Board.Observer {
 		// give ship items
 		ShipType[] ships = game.getShipTypes();
 		for (ShipType shipType : ships) {
-			leftPlayer.getInventory().addItem(shipType.getNormal().toItemStack());
-			rightPlayer.getInventory().addItem(shipType.getNormal().toItemStack());
+			leftPlayer.getInventory().addItem(shipType.getNormal().toItemStack(shipType.getShipSize()));
+			rightPlayer.getInventory().addItem(shipType.getNormal().toItemStack(shipType.getShipSize()));
 		}
-		
-	}
-
-	@Override
-	public void onMiss(Tile tile) {
-		// TODO player says: Miss!
-	}
-
-	@Override
-	public void onHit(Tile tile) {
-		// TODO player says: Hit!
-	}
-
-	@Override
-	public void onShipDestroyed(Ship ship) {
-		// TODO player says: You sunk my ship.getName()
-		
-		if(!game.areAllShipsDestroyed()) {
-			return;
-		}
-		// TODO game end
-	}
-
-	@Override
-	public void onShipPlace(Ship ship) {
-		Board board = ship.getBoard();
-		if(!board.areAllShipsPlaced()) {
-			return;
-		}
-		if(!board.areAllShipsPlaced()) {
-			return;
-		}
-		// all ships are placed on both sides
-		
-		// we are done placing ships, 
-		// switch views so we can start placing bombs
-		view.getLeftSide().getInteractiveView().switchViews(view.getLeftSide().getProjectorView());
-		view.getRightSide().getInteractiveView().switchViews(view.getRightSide().getProjectorView());
-		
-		// TODO start placing bombs
-		Player leftPlayer = getLeftPlayer().getPlayer();
-		Player rightPlayer = getRightPlayer().getPlayer();
-		// TODO see whos turn it is, give TNT
-	}
-
-	@Override
-	public void onShipRemove(Ship ship) {
-		
+		leftPlayer.updateInventory();
+		rightPlayer.updateInventory();
 	}
 
 }

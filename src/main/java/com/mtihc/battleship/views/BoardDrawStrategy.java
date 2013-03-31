@@ -2,8 +2,8 @@ package com.mtihc.battleship.views;
 
 import org.bukkit.block.Block;
 
-import com.mtihc.battleship.models.Ship;
-import com.mtihc.battleship.models.Tile;
+import com.mtihc.battleship.models.Board.Ship;
+import com.mtihc.battleship.models.Board.Tile;
 
 public class BoardDrawStrategy {
 

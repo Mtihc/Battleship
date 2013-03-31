@@ -7,7 +7,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.mtihc.battleship.models.Game;
-import com.mtihc.battleship.models.GameRepository;
+import com.mtihc.battleship.models.GameData;
+import com.mtihc.battleship.models.GameDataRepository;
+import com.mtihc.battleship.models.GamePlayer;
 
 public class GameManager {
 
@@ -27,9 +29,9 @@ public class GameManager {
 	
 	
 	private JavaPlugin plugin;
-	private GameRepository repo;
+	private GameDataRepository repo;
 	private HashMap<String, GameController> games = new HashMap<String, GameController>();
-	private HashMap<String, GamePlayer> players = new HashMap<String, GamePlayer>();
+	private HashMap<String, GamePlayerController> players = new HashMap<String, GamePlayerController>();
 
 	/**
 	 * Constructor.
@@ -39,7 +41,7 @@ public class GameManager {
 	 * @throws Exception
 	 *             when the GameManager is already created.
 	 */
-	public GameManager(JavaPlugin plugin, GameRepository repository) throws Exception {
+	public GameManager(JavaPlugin plugin, GameDataRepository repository) throws Exception {
 		
 		// singleton, can only be created once
 		if (instance != null) {
@@ -71,10 +73,10 @@ public class GameManager {
 	}
 	
 	/**
-	 * Returns the GameRepository.
+	 * Returns the GameDataRepository.
 	 * @return the game repository.
 	 */
-	public GameRepository getGameRepository() {
+	public GameDataRepository getGameRepository() {
 		return repo;
 	}
 	
@@ -91,21 +93,21 @@ public class GameManager {
 		return players.containsKey(name);
 	}
 	
-	public GamePlayer getPlayer(String name) {
+	public GamePlayerController getPlayer(String name) {
 		return players.get(name);
 	}
 
 	/**
 	 * Initialize a game. 
 	 * 
-	 * @param game the game to initialize
+	 * @param settings the game settings to initialize
 	 * @param leftPlayer the left player
 	 * @param rightPlayer the right player
 	 * @throws GameException when game is already being played
 	 */
-	public GameController createController(Game game, Player leftPlayer, Player rightPlayer) throws GameException {
-		if(games.containsKey(game.getId())) {
-			throw new GameException("Somebody is already playing at \"" + game.getId() + "\".");
+	public GameController createController(GameData settings, Player leftPlayer, Player rightPlayer) throws GameException {
+		if(games.containsKey(settings.getId())) {
+			throw new GameException("Somebody is already playing at \"" + settings.getId() + "\".");
 		}
 		if(hasPlayer(leftPlayer.getName())) {
 			throw new GameException(leftPlayer.getName() + " is already playing a game.");
@@ -116,19 +118,14 @@ public class GameManager {
 		
 		GamePlayer left = new GamePlayer(leftPlayer);
 		GamePlayer right = new GamePlayer(rightPlayer);
+		Game game = new Game(settings, left, right);
 		
-		GameController controller = new GameController(plugin, left, right, game);
+		GameController controller = new GameController(plugin, game);
 		// TODO remove from the map. at some point
-		games.put(controller.getId(), controller);
-		
-		left.controller = controller;
-		right.controller = controller;
-		left.view = controller.getView().getLeftSide();
-		right.view = controller.getView().getRightSide();
-		
+		games.put(settings.getId(), controller);
 		// TODO remove both from the map, at some point
-		players.put(left.getName(), left);
-		players.put(right.getName(), right);
+		players.put(left.getName(), controller.getLeftPlayerController());
+		players.put(right.getName(), controller.getRightPlayerController());
 		
 		return controller;
 	}

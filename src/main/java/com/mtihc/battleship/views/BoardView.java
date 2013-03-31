@@ -4,60 +4,24 @@ import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
 import com.mtihc.battleship.models.Board;
-import com.mtihc.battleship.models.Ship;
-import com.mtihc.battleship.models.Tile;
+import com.mtihc.battleship.models.Board.Ship;
+import com.mtihc.battleship.models.Board.Tile;
 
-public class BoardView implements Board.Observer {
+public class BoardView {
 
-	// only using SOUTH, WEST, NORTH, EAST
-	public static final BlockFace[] axis = { BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST };
-
-	/**
-	 * Convert a yaw value to one of the following BlockFace enum values: NORTH, EAST, SOUTH or WEST.
-	 * @param yaw the yaw value
-	 * @return the BlockFace enum value
-	 */
-	public static BlockFace yawToFace(float yaw) {
-		return axis[Math.round(yaw / 90f) & 0x3];
-	}
-	
-	/**
-	 * Convert a BlockFace enum value, to a yaw value. Only accepts: NORTH, EAST, SOUTH, WEST.
-	 * Other values will result in 0, which happens to be south.
-	 * @param face the BlockFace enum value
-	 * @return the yaw value
-	 */
-	public static float faceToYaw(BlockFace face) {
-		switch(face) {
-		case EAST:
-			return -90;
-		case NORTH:
-			return 180;
-		case WEST:
-			return 90;
-		case SOUTH:
-			return 0;
-		default:
-			return 0;
-		}
-	}
-	
-	
-	
-	
-	
 	private Board board;
 	private Location origin;
-	private BlockFace facing;
+	private BlockFace face;
 
 	private BoardLocationStrategy locationStrategy;
-
 	private BoardDrawStrategy drawStrategy;
+	
+	private BoardObserver observer = new BoardObserver();
 
-	public BoardView(Board board, Location origin, BlockFace facing) {
+	public BoardView(Board board, Location origin, BlockFace face) {
 		setBoard(board);
 		this.origin = origin;
-		this.facing = facing;
+		this.face = face;
 		this.locationStrategy = BoardLocationStrategy.HORIZONTAL;
 		this.drawStrategy = BoardDrawStrategy.NORMAL;
 	}
@@ -80,45 +44,13 @@ public class BoardView implements Board.Observer {
 	public void setBoard(Board board) {
 		if(this.board != board) {
 			if(this.board != null) {
-				this.board.removeObserver(this);
+				this.board.removeObserver(observer);
 			}
 			if(board != null) {
-				board.addObserver(this);
+				board.addObserver(observer);
 			}
 			this.board = board;
 		}
-	}
-	
-	/**
-	 * Define another BoardView, and let it switch models and draw strategy with this BoardView.
-	 * @param otherView the other BoardView
-	 */
-	public void switchViews(BoardView otherView) {
-		// switch draw strategy
-		BoardDrawStrategy s = this.drawStrategy;
-		setDrawStrategy(otherView.getDrawStrategy());
-		otherView.setDrawStrategy(s);
-		
-		// switch boards
-		Board b = this.board;
-		setBoard(otherView.getBoard());
-		otherView.setBoard(b);
-		
-		// redraw
-		draw();
-		otherView.draw();
-	}
-	
-	/**
-	 * Get the center location of this board view. (assuming the horizontal location strategy is used)
-	 * 
-	 * @return the center location
-	 */
-	public Location getCenterLocation() {
-		Location result = locationStrategy.tileToLocation(this, board.getWidth() / 2, board.getHeight() / 2);
-		result.setYaw(faceToYaw(facing));
-		result.setPitch(0);
-		return result;
 	}
 
 	/**
@@ -133,8 +65,8 @@ public class BoardView implements Board.Observer {
 	 * Return the facing direction (can only be NORTH, EAST, SOUTH or WEST)
 	 * @return the facing direction
 	 */
-	public BlockFace getFacingDirection() {
-		return facing;
+	public BlockFace getFace() {
+		return face;
 	}
 
 	/**
@@ -148,32 +80,11 @@ public class BoardView implements Board.Observer {
 
 	/**
 	 * Set the draw strategy.
-	 * 
 	 * <p>Change the draw strategy to, for example, hide ships. Or give the board a different look.</p>
-	 * 
 	 * @param drawStrategy
 	 */
 	public void setDrawStrategy(BoardDrawStrategy drawStrategy) {
 		this.drawStrategy = drawStrategy;
-	}
-
-	/**
-	 * Returns the location strategy.
-	 * @return location strategy
-	 */
-	public BoardLocationStrategy getLocationStrategy() {
-		return locationStrategy;
-	}
-
-	/**
-	 * Set the location strategy. 
-	 * 
-	 * <p>Change the location strategy to, for example, create a vertical board.</p>
-	 * 
-	 * @param locationStrategy
-	 */
-	public void setLocationStrategy(BoardLocationStrategy locationStrategy) {
-		this.locationStrategy = locationStrategy;
 	}
 
 	/**
@@ -191,36 +102,76 @@ public class BoardView implements Board.Observer {
 	public void draw(int x, int y) {
 		drawStrategy.draw(this, x, y);
 	}
+
+	/**
+	 * Returns the location strategy.
+	 * @return location strategy
+	 */
+	public BoardLocationStrategy getLocationStrategy() {
+		return locationStrategy;
+	}
+
+	/**
+	 * Set the location strategy. 
+	 * <p>Change the location strategy to, for example, create a vertical board.</p>
+	 * @param locationStrategy
+	 */
+	public void setLocationStrategy(BoardLocationStrategy locationStrategy) {
+		this.locationStrategy = locationStrategy;
+	}
 	
-	@Override
-	public void onMiss(Tile tile) {
-		draw(tile.getX(), tile.getY());
+	public Location tileToLocation(int x, int y) {
+		return locationStrategy.tileToLocation(this, x, y);
 	}
-
-	@Override
-	public void onHit(Tile tile) {
-		draw(tile.getX(), tile.getY());
+	
+	public Tile locationToTile(Location location) {
+		return locationStrategy.locationToTile(this, location);
 	}
+	
 
-	@Override
-	public void onShipDestroyed(Ship ship) {
-		// empty
-	}
+	public class BoardObserver implements Board.Observer {
 
-	@Override
-	public void onShipPlace(Ship ship) {
-		Tile[] tiles = ship.getTiles();
-		for (Tile tile : tiles) {
+		@Override
+		public void onMiss(Board board, Tile tile) {
 			draw(tile.getX(), tile.getY());
 		}
-	}
 
-	@Override
-	public void onShipRemove(Ship ship) {
-		Tile[] tiles = ship.getTiles();
-		for (Tile tile : tiles) {
+		@Override
+		public void onHit(Board board, Tile tile) {
 			draw(tile.getX(), tile.getY());
 		}
+
+		@Override
+		public void onShipPlace(Board board, Ship ship) {
+			Tile[] tiles = ship.getTiles();
+			for (Tile tile : tiles) {
+				draw(tile.getX(), tile.getY());
+			}
+		}
+
+		@Override
+		public void onAllShipsPlaced(Board board) {
+			
+		}
+
+		@Override
+		public void onShipRemove(Board board, Ship ship) {
+			Tile[] tiles = ship.getTiles();
+			for (Tile tile : tiles) {
+				draw(tile.getX(), tile.getY());
+			}
+		}
+
+		@Override
+		public void onShipDestroyed(Board board, Ship ship) {
+			
+		}
+
+		@Override
+		public void onAllShipsDestroyed(Board board) {
+			
+		}
+
 	}
 
 }

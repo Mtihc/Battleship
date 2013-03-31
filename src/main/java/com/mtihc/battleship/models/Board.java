@@ -2,56 +2,26 @@ package com.mtihc.battleship.models;
 
 import java.util.LinkedHashSet;
 
-
 public class Board {
-
-	public interface Observer {
-		void onMiss(Tile tile);
-
-		void onHit(Tile tile);
-
-		void onShipDestroyed(Ship ship);
-
-		void onShipPlace(Ship ship);
-
-		void onShipRemove(Ship ship);
-	}
-
-	private LinkedHashSet<Observer> observers = new LinkedHashSet<Observer>();
-
-	private Game game;
-	private Tile[][] board;
+	
+	private Tile[][] tiles;
 	private Ship[] ships;
-	Board enemy;
+	
+	public Board(int width, int height, ShipType[] shipTypes) {
 
-	public Board(Game game) {
-		
-		this.game = game;
-		int width = game.getWidth();
-		int height = game.getHeight();
-		ShipType[] shipTypes = game.getShipTypes();
-		
 		// create tiles
-		this.board = new Tile[width][height];
+		this.tiles = new Tile[width][height];
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				board[x][y] = new Tile(this, x, y);
+				tiles[x][y] = new Tile(x, y);
 			}
-		}
+		}                    
 		
 		// create ships array
 		this.ships = new Ship[shipTypes.length];
 		for (int i = 0; i < shipTypes.length; i++) {
-			this.ships[i] = new Ship(this, shipTypes[i]);
+			this.ships[i] = new Ship(shipTypes[i]);
 		}
-	}
-	
-	public Game getGame() {
-		return game;
-	}
-	
-	public Board getEnemy() {
-		return enemy;
 	}
 	
 	/**
@@ -59,7 +29,7 @@ public class Board {
 	 * @return the width of the board
 	 */
 	public int getWidth() {
-		return board.length;
+		return tiles.length;
 	}
 	
 	/**
@@ -67,7 +37,7 @@ public class Board {
 	 * @return the height of the board
 	 */
 	public int getHeight() {
-		return board[0].length;
+		return tiles[0].length;
 	}
 	
 	/**
@@ -78,7 +48,7 @@ public class Board {
 	 * @throws IndexOutOfBoundsException when the x-coordinate or y-coordate are out of bounds
 	 */
 	public Tile getTile(int x, int y) throws IndexOutOfBoundsException {
-		return board[x][y];
+		return tiles[x][y];
 	}
 
 	/**
@@ -86,7 +56,16 @@ public class Board {
 	 * @return an array of Ship objects
 	 */
 	public Ship[] getShips() {
-		return ships;
+		return ships.clone();
+	}
+	
+	/**
+	 * Returns the ship at the current index. 
+	 * @param index
+	 * @return
+	 */
+	public Ship getShip(int index) {
+		return ships[index];
 	}
 	
 	/**
@@ -99,7 +78,8 @@ public class Board {
 	
 	public boolean areAllShipsDestroyed() {
 		for (int i = 0; i < ships.length; i++) {
-			if(!ships[i].isDestroyed()) {
+			Ship ship = ships[i];
+			if(!ship.isDestroyed()) {
 				return false;
 			}
 		}
@@ -108,85 +88,235 @@ public class Board {
 	
 	public boolean areAllShipsPlaced() {
 		for (int i = 0; i < ships.length; i++) {
-			if(!ships[i].isPlaced()) {
+			Ship ship = ships[i];
+			if(!ship.isPlaced()) {
 				return false;
 			}
 		}
 		return true;
 	}
 	
-
-	
-
 	/**
-	 * Add an observer to the list.
-	 * @param observer the observer to add
+	 * The Tile class represents a tile on the board.
+	 * <p>A tile can get hit. When it's occupied by a ship, it's a hit. When there's no ship, it's a miss.</p>
+	 * 
+	 * @author Mitch
+	 *
 	 */
+	public class Tile {
+		private int x;
+		private int y;
+		private boolean hit;
+		private Ship ship;
+
+		Tile(int x, int y) {
+			this.x = x;
+			this.y = y;
+			this.hit = false;
+			this.ship = null;
+		}
+		
+		public Board getBoard() {
+			return Board.this;
+		}
+		
+		public int getX() {
+			return x;
+		}
+		
+		public int getY() {
+			return y;
+		}
+		
+		public boolean isHit() {
+			return hit;
+		}
+		
+		public boolean hasShip() {
+			return ship != null;
+		}
+
+		public Ship getShip() {
+			return ship;
+		}
+		
+		public void hit() {
+			if(hit) {
+				return;
+			}
+			hit = true;
+			if(hasShip()) {
+				// TODO onHit
+				onHit(this);
+				if(ship.isDestroyed()) {
+					// TODO onShipDestroyed
+					onShipDestroyed(ship);
+					
+					if(areAllShipsDestroyed()) {
+						// TODO onAllShipsDestroyed
+						onAllShipsDestroyed();
+					}
+				}
+			}
+			else {
+				// TOODO onMiss
+				onMiss(this);
+			}
+		}
+	}
+	
+	/**
+	 * The Ship class represents a ship on the board. 
+	 * 
+	 * @author Mitch
+	 *
+	 */
+	public class Ship {
+		private ShipType type;
+		private Tile[] tiles;
+
+		Ship(ShipType type) {
+			this.type = type;
+			this.tiles = new Tile[type.getShipSize()];
+		}
+		
+		public Board getBoard() {
+			return Board.this;
+		}
+		
+		public ShipType getType() {
+			return type;
+		}
+		
+		public int getSize() {
+			return tiles.length;
+		}
+		
+		public Tile getTile(int index) {
+			return tiles[index];
+		}
+		
+		public Tile[] getTiles() {
+			return tiles.clone();
+		}
+		
+		public boolean isPlaced() {
+			for (int i = 0; i < tiles.length; i++) {
+				if(tiles[i] == null) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		public boolean isDestroyed() {
+			for (int i = 0; i < tiles.length; i++) {
+				if(!tiles[i].isHit()) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+
+		public void place(Tile ...args) {
+			for (int i = 0; i < args.length; i++) {
+				Tile tile = args[i];
+				
+				tiles[i] = tile;
+				tile.ship = this;
+			}
+			
+			// TODO onShipPlace
+			onShipPlace(this);
+			
+			if(areAllShipsPlaced()) {
+				// TODO onAllShipsPlaced
+				onAllShipsPlaced();
+			}
+		}
+
+		public void remove() {
+			
+			// TODO onShipRemove
+			onShipRemove(this);
+			
+			for (int i = 0; i < tiles.length; i++) {
+				Tile tile = tiles[i];
+
+				tiles[i] = null;
+				tile.ship = null;
+			}
+		}
+	}
+	
+	private LinkedHashSet<Observer> observers = new LinkedHashSet<Board.Observer>();
+	
 	public void addObserver(Observer observer) {
 		observers.add(observer);
 	}
 	
-	/**
-	 * Remove an observer from the list.
-	 * @param observer the observer to remove
-	 */
 	public void removeObserver(Observer observer) {
 		observers.remove(observer);
 	}
 	
-	/**
-	 * Called when the enemy attacked this board, but didn't hit a ship.
-	 * @param tile the tile that was hit
-	 */
+	public interface Observer {
+		void onMiss(Board board, Tile tile);
+		void onHit(Board board, Tile tile);
+		void onShipPlace(Board board, Ship ship);
+		void onAllShipsPlaced(Board board);
+		void onShipRemove(Board board, Ship ship);
+		void onShipDestroyed(Board board, Ship ship);
+		void onAllShipsDestroyed(Board board);
+	}
+
 	protected void onMiss(Tile tile) {
-		// notify observers
-		for (Observer observer : observers) {
-			observer.onMiss(tile);
+		Observer[] os = observers.toArray(new Observer[observers.size()]);
+		for (Observer observer : os) {
+			observer.onMiss(this, tile);
 		}
 	}
 
-	/**
-	 * Called when the enemy attacked and hit a ship!
-	 * @param tile the tile that was hit and contains part of the ship
-	 */
 	protected void onHit(Tile tile) {
-		// notify observers
-		for (Observer observer : observers) {
-			observer.onHit(tile);
+		Observer[] os = observers.toArray(new Observer[observers.size()]);
+		for (Observer observer : os) {
+			observer.onHit(this, tile);
 		}
 	}
 
-	/**
-	 * Called when all all tiles belonging to a ship are hit. 
-	 * @param ship the ship that was destroyed
-	 */
-	protected void onShipDestoyed(Ship ship) {
-		// notify observers
-		for (Observer observer : observers) {
-			observer.onShipDestroyed(ship);
-		}
-	}
-
-	/**
-	 * Called when a ship is placed on the board, during setup.
-	 * @param ship the ship that was placed
-	 */
 	protected void onShipPlace(Ship ship) {
-		// notify observers
-		for (Observer observer : observers) {
-			observer.onShipPlace(ship);
+		Observer[] os = observers.toArray(new Observer[observers.size()]);
+		for (Observer observer : os) {
+			observer.onShipPlace(this, ship);
 		}
-		
 	}
 
-	/**
-	 * Called when a ship is removed from the board, during setup.
-	 * @param ship
-	 */
-	protected void onShipRemove(Ship ship) {
-		// notify observers
-		for (Observer observer : observers) {
-			observer.onShipRemove(ship);
+	protected void onAllShipsPlaced() {
+		Observer[] os = observers.toArray(new Observer[observers.size()]);
+		for (Observer observer : os) {
+			observer.onAllShipsPlaced(this);
 		}
 	}
+
+	protected void onShipRemove(Ship ship) {
+		Observer[] os = observers.toArray(new Observer[observers.size()]);
+		for (Observer observer : os) {
+			observer.onShipRemove(this, ship);
+		}
+	}
+
+	protected void onShipDestroyed(Ship ship) {
+		Observer[] os = observers.toArray(new Observer[observers.size()]);
+		for (Observer observer : os) {
+			observer.onShipDestroyed(this, ship);
+		}
+	}
+
+	protected void onAllShipsDestroyed() {
+		Observer[] os = observers.toArray(new Observer[observers.size()]);
+		for (Observer observer : os) {
+			observer.onAllShipsDestroyed(this);
+		}
+	}
+	
 }
